@@ -1,0 +1,23 @@
+name: kurchello
+run-name: My-Fat-Guy
+on:
+  push:
+    branches:
+      -master
+
+jobs:
+
+
+      my_slave:
+        runs-on: ubuntu-latest
+        steps:
+        - name: Print fat Manson!
+          run : echo "Hello Fat Manson!"
+
+
+
+      build:
+        runs-on: ubuntu-latest
+        steps:
+        - name: Print fat Manson!
+          run : echo "Hello Fat Manson!"
