@@ -1,4 +1,7 @@
 name: kurchello
+env:
+  APPLICATION_NAME: "MyDaun"
+  PACKAGE_NAME    : "Daun_file_ver-${{ github.sha }}"
 run-name: My-Fat-Guy
 on:
   push:
