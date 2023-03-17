@@ -1,8 +1,9 @@
-name: kurchello
+name: MansonIsSoFat
 env:
   APPLICATION_NAME: "MyDaun"
   PACKAGE_NAME    : "Daun_file_ver-${{ github.sha }}"
-run-name: My-Fat-Guy
+
+run-name: kurchello
 on:
   push:
     branches:
@@ -11,16 +12,27 @@ on:
 jobs:
 
 
-      my_slave:
+      my_marlyn:
         runs-on: ubuntu-latest
         steps:
         - name: Print fat Manson!
           run : echo "Hello Fat Manson!"
 
+        - name: Pull some messages
+          run : 
+            echo "Pon!"
+            echo "marlynissofatguy!"
+            echo "Application name ${{ env.APPLICATION_NAME }}"
 
 
-      build:
+
+
+      my_manson:
         runs-on: ubuntu-latest
+        needs: [my_marlyn]
         steps:
         - name: Print fat Manson!
           run : echo "Hello Fat Manson!"
+
+        - name: Printing deploy pachage
+          run : echo "Deployment package name is ${{ env.PACKAGE_NAME }}"
