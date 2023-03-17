@@ -3,7 +3,7 @@ run-name: My-Fat-Guy
 on:
   push:
     branches:
-      -master
+      - master
 
 jobs:
 
