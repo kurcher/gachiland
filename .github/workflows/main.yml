@@ -3,7 +3,7 @@ env:
   APPLICATION_NAME: "MyDaun"
   PACKAGE_NAME    : "Daun_file_ver-${{ github.sha }}"
 
-run-name: kurchello
+run-name: My-Fat-Guy
 on:
   push:
     branches:
@@ -25,6 +25,15 @@ jobs:
             echo "Application name ${{ env.APPLICATION_NAME }}"
 
 
+        - name: List folder before 
+          run : ls -la
+
+        - name: Git clone
+          uses: actions/checkout@v1
+
+        - name: List folder after
+          run : ls -la
+
 
 
       my_manson:
@@ -36,3 +45,9 @@ jobs:
 
         - name: Printing deploy pachage
           run : echo "Deployment package name is ${{ env.PACKAGE_NAME }}"
+
+        - name: Lets name some packages of they are here 1
+          run: aws --version
+
+        - name: Lets name some packages of they are here 2
+          run: zip
