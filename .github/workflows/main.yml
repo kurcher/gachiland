@@ -39,7 +39,7 @@ jobs:
   build-and-push-manual:
     runs-on: ubuntu-latest
     if: github.event_name == 'workflow_dispatch'
-     inputs:
+    inputs:
       tag:
         description: 'Tag to use for the Docker image'
         required: true
