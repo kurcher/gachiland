@@ -9,7 +9,7 @@ on:
 env:
   DOCKER_USERNAME: ${{ secrets.kurch1k }}
   DOCKER_PASSWORD: ${{ secrets.07072007123ABZ }}
-  DOCKER_REGISTRY: nikokovach
+  DOCKER_REGISTRY: https://hub.docker.com/repository/docker/kurch1k/nikokovach/general
 
 jobs:
   build-and-push:
@@ -39,8 +39,7 @@ jobs:
   build-and-push-manual:
     runs-on: ubuntu-latest
     if: github.event_name == 'workflow_dispatch'
-
-    inputs:
+     inputs:
       tag:
         description: 'Tag to use for the Docker image'
         required: true
