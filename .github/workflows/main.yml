@@ -1,53 +1,66 @@
-name: MansonIsSoFat
-env:
-  APPLICATION_NAME: "MyDaun"
-  PACKAGE_NAME    : "Daun_file_ver-${{ github.sha }}"
+name: Docker Build and Push
 
-run-name: My-Fat-Guy
 on:
   push:
     branches:
       - master
+  workflow_dispatch:
+
+env:
+  DOCKER_USERNAME: ${{ secrets.kurch1k }}
+  DOCKER_PASSWORD: ${{ secrets.07072007123ABZ }}
+  DOCKER_REGISTRY: nikokovach
 
 jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
 
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      my_marlyn:
-        runs-on: ubuntu-latest
-        steps:
-        - name: Print fat Manson!
-          run : echo "Hello Fat Manson!"
+    - name: Login to Docker registry
+      uses: docker/login-action@v1
+      with:
+        registry: ${{ env.DOCKER_REGISTRY }}
+        username: ${{ env.DOCKER_USERNAME }}
+        password: ${{ env.DOCKER_PASSWORD }}
 
-        - name: Pull some messages
-          run : 
-            echo "Pon!"
-            echo "marlynissofatguy!"
-            echo "Application name ${{ env.APPLICATION_NAME }}"
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        push: true
+        tags: |
+          ${{ env.DOCKER_REGISTRY }}/my-image:${{ github.sha }}
+          ${{ env.DOCKER_REGISTRY }}/my-image:latest
 
+  build-and-push-manual:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
 
-        - name: List folder before 
-          run : ls -la
+    inputs:
+      tag:
+        description: 'Tag to use for the Docker image'
+        required: true
 
-        - name: Git clone
-          uses: actions/checkout@v1
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-        - name: List folder after
-          run : ls -la
+    - name: Login to Docker registry
+      uses: docker/login-action@v1
+      with:
+        registry: ${{ env.DOCKER_REGISTRY }}
+        username: ${{ env.DOCKER_USERNAME }}
+        password: ${{ env.DOCKER_PASSWORD }}
 
-
-
-      my_manson:
-        runs-on: ubuntu-latest
-        needs: [my_marlyn]
-        steps:
-        - name: Print fat Manson!
-          run : echo "Hello Fat Manson!"
-
-        - name: Printing deploy pachage
-          run : echo "Deployment package name is ${{ env.PACKAGE_NAME }}"
-
-        - name: Lets name some packages of they are here 1
-          run: aws --version
-
-        - name: Lets name some packages of they are here 2
-          run: zip
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        push: true
+        tags: |
+          ${{ env.DOCKER_REGISTRY }}/my-image:${{ github.run_id }}-${{ inputs.tag }}
+          ${{ env.DOCKER_REGISTRY }}/my-image:${{ inputs.tag }}
