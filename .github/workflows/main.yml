@@ -8,7 +8,7 @@ on:
 
 env:
   DOCKER_USERNAME: ${{ secrets.kurch1k }}
-  DOCKER_PASSWORD: ${{ 07072007123ABZ }}
+  DOCKER_PASSWORD: ${{ secrets.07072007123ABZ }}
   DOCKER_REGISTRY: nikokovach
 
 jobs:
