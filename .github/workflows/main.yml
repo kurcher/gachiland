@@ -39,10 +39,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event_name == 'workflow_dispatch'
 
-    inputs:
-      tag:
-        description: 'Tag to use for the Docker image'
-        required: true
+ 
 
     steps:
     - name: Checkout code
