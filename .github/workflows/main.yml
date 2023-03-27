@@ -24,6 +24,10 @@ jobs:
         with:
           username: ${{ secrets.KURCHELLO_USERNAME }}
           password: ${{ secrets.KURCHELLO_TOKEN }}
+          
+          
+          
+          
   manual_build_and_push_docker_image:
     name: Manual Build and Push Docker Image
     needs: []
