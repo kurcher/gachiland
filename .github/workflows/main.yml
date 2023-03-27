@@ -1,4 +1,4 @@
-name: Build and push Docker images
+name: Docker Build and Push
 
 on:
   push:
@@ -6,52 +6,57 @@ on:
       - master
   workflow_dispatch:
 
+env:
+  DOCKER_USERNAME: ${{ secrets.KURCHELLO_USERNAME }}
+  DOCKER_PASSWORD: ${{ secrets.KURCHELLO_USERNAME }}
+  DOCKER_REGISTRY: nikokovach
+
 jobs:
-  build-and-push-master:
-    name: Build and push Docker image for master branch
+  build-and-push:
     runs-on: ubuntu-latest
-    if: "github.ref == 'refs/heads/master'"
+    if: github.ref == 'refs/heads/master'
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.KURCHELLO_USERNAME }}
-          password: ${{ secrets.KURCHELLO_USERNAME }}
+    - name: Login to Docker registry
+      uses: docker/login-action@v1
+      with:
+        registry: ${{ env.DOCKER_REGISTRY }}
+        username: ${{ env.DOCKER_USERNAME }}
+        password: ${{ env.DOCKER_PASSWORD }}
 
-      - name: Build and push Docker image for master branch
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          push: true
-          tags: ${{ secrets.KURCHELLO_USERNAME }}/ubuntu:${{ github.sha }}
-
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        push: true
+        tags: |
+          ${{ env.DOCKER_REGISTRY }}/my-image:${{ github.sha }}
+          ${{ env.DOCKER_REGISTRY }}/my-image:latest
   build-and-push-manual:
-    name: Build and push Docker image with manual tag
     runs-on: ubuntu-latest
-    if: "github.event_name == 'workflow_dispatch'"
+    if: github.event_name == 'workflow_dispatch'
+
+
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.KURCHELLO_USERNAME }}
-          password: ${{ secrets.KURCHELLO_PASSWORD }}
+    - name: Login to Docker registry
+      uses: docker/login-action@v1
+      with:
+        registry: ${{ env.DOCKER_REGISTRY }}
+        username: ${{ env.DOCKER_USERNAME }}
+        password: ${{ env.DOCKER_PASSWORD }}
 
-      - name: Ask for image tag
-        id: tag_input
-        run: |
-          echo "::set-output name=TAG::$(read -p 'Enter image tag: ' tag && echo $tag)"
-
-      - name: Build and push Docker image with manual tag
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          push: true
-          tags: ${{ secrets.KURCHELLO_USERNAME }}/ubuntu:${{ steps.tag_input.outputs.TAG }}
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        push: true
+        tags: |
+          ${{ env.DOCKER_REGISTRY }}/my-image:${{ github.run_id }}-${{ inputs.tag }}
+          ${{ env.DOCKER_REGISTRY }}/my-image:${{ inputs.tag }}
