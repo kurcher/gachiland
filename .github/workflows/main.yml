@@ -1,4 +1,4 @@
-name: Build and push Docker images
+name: Build and Push Docker Image
 
 on:
   push:
@@ -7,55 +7,55 @@ on:
   workflow_dispatch:
 
 env:
-  DOCKER_HUB_REPO: nikokovach
-  DOCKER_IMAGE_NAME: ubuntu
-
+          DOCKER_USERNAME:      ${{ secrets.KURCHELLO_USERNAME }}
+          DOCKER_PASSWORD:      ${{ secrets.KURCHELLO_PASSWORD }}
+          DOCKER_ACCESS_TOKEN:  ${{ secrets.KURCHELLO_TOKEN }}
 jobs:
-  build-and-push-master:
-    name: Build and push Docker image for master branch
+  build_and_push_docker_image:
+    name: PUSH
     runs-on: ubuntu-latest
-    if: "github.ref == 'refs/heads/master'"
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v1
+    - name: Login to Docker Hub
+      uses: docker/login-action@v1
+      with:
+       DOCKER_USERNAME:        ${{ secrets.KURCHELLO_USERNAME}}
+       DOCKER_PASSWORD:        ${{ secrets.KURCHELLO_PASSWORD }}
+       DOCKER_ACCESS_TOKEN:    ${{ secrets.KURCHELLO_TOKEN }}
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.KURCHELLO_USERNAME }}
-          password: ${{ secrets.KURCHELLO_PASSWORD }}
+    - name: Test
+      run: mvn clean verify -U
+    - name: build
+      run: ./mvnw compile jib:dockerBuild
+    - name: push
+      run:  docker push odfsoft/guess-game:latest
 
-      - name: Build and push Docker image for master branch
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          push: true
-          tags: ${{ env.DOCKER_HUB_REPO }}/${{ env.DOCKER_IMAGE_NAME }}:${{ github.sha }}
 
-  build-and-push-manual:
-    name: Build and push Docker image with manual tag
+  manual_build_and_push_docker_image:
+    name: Manual Build and Push Docker Image
+    needs: []
     runs-on: ubuntu-latest
-    if: "github.event_name == 'workflow_dispatch'"
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v1
+    - name: Login to Docker Hub
+      uses: docker/login-action@v1
+      with:
+        DOCKER_USERNAME:       ${{ secrets.KURCHELLO_USERNAME }}
+        DOCKER_PASSWORD:       ${{ secrets.KURCHELLO_PASSWORD }}
+        DOCKER_ACCESS_TOKEN:   ${{ secrets.KURCHELLO_TOKEN }}
 
-      - name: Login to Docker Hub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.KURCHELLO_USERNAME }}
-          password: ${{ secrets.KURCHELLO_PASSWORD }}
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        push: true
+        tags: ${{ github.repository }}:${{ github.event.inputs.tag }}
+      if: github.event_name == 'workflow_dispatch'
+      env:
+        INPUT_TAG: ${{ github.event.inputs.tag }}
+    - uses: actions/checkout@v1
+    - name: Login to DockerHub Registry
+      run: echo ${{ secrets.KURCHELLO_PASSWORD }} | docker login -u ${{ secrets.KURCHELLO_USERNAME }} --password-stdin
 
-      - name: Ask for image tag
-        id: tag_input
-        run: |
-          echo "::set-output name=TAG::$(read -p 'Enter image tag: ' tag && echo $tag)"
-
-      - name: Build and push Docker image with manual tag
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          push: true
-          tags: ${{ env.DOCKER_HUB_REPO }}/${{ env.DOCKER_IMAGE_NAME }}:${{ steps.tag_input.outputs.TAG }}
