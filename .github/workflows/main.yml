@@ -6,10 +6,6 @@ on:
       - master
   workflow_dispatch:
 
-env:
-          DOCKER_USERNAME:      ${{ secrets.KURCHELLO_USERNAME }}
-          DOCKER_PASSWORD:      ${{ secrets.KURCHELLO_PASSWORD }}
-          DOCKER_ACCESS_TOKEN:  ${{ secrets.KURCHELLO_TOKEN }}
 
 jobs:
   push_to_registry:
@@ -24,10 +20,12 @@ jobs:
         with:
           username: ${{ secrets.KURCHELLO_USERNAME }}
           password: ${{ secrets.KURCHELLO_TOKEN }}
-          
-          
-          
-          
+
+      - name: TEST secrets
+        run: echo ${{ secrets.KURCHELLO_USERNAME }} & echo ${{ secrets.KURCHELLO_PASSWORD }} & echo ${{ secrets.KURCHELLO_TOKEN }}
+
+
+
   manual_build_and_push_docker_image:
     name: Manual Build and Push Docker Image
     needs: []
@@ -38,7 +36,7 @@ jobs:
     - name: Log in to Docker Hub
       uses: docker/login-action@v2
       with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+        username: ${{ secrets.KURCHELLO_USERNAME }}
+        password: ${{ secrets.KURCHELLO_TOKEN }}
     - name: Build the Docker image
       run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
