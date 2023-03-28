@@ -1,28 +1,42 @@
-name: Build and Push Docker Image to Docker Hub
+name: Build and Push Docker Image
 
 on:
   push:
     branches:
       - master
+  workflow_dispatch:
+
 
 jobs:
-  build-and-push-image:
+  push_to_registry:
+    name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Build Docker image
-        run: |
-          docker build -t kurch1k/nikokovach:latest .
+      - name: Check out the repo
+        uses: actions/checkout@v3
 
       - name: Log in to Docker Hub
-        uses: docker/login-action@v1
+        uses: docker/login-action@v2
         with:
           username: ${{ secrets.KURCHELLO_USERNAME }}
-          password: ${{ secrets.KURCHELLO_PASSWORD }}
+          password: ${{ secrets.KURCHELLO_TOKEN }}
 
-      - name: Push Docker image to Docker Hub
-        run: |
-          docker push kurch1k/nikokovach:latest
+      - name: TEST secrets
+        run: echo ${{ secrets.KURCHELLO_USERNAME }} & echo ${{ secrets.KURCHELLO_PASSWORD }} & echo ${{ secrets.KURCHELLO_TOKEN }}
+
+
+
+  manual_build_and_push_docker_image:
+    name: Manual Build and Push Docker Image
+    needs: []
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.KURCHELLO_USERNAME }}
+        password: ${{ secrets.KURCHELLO_TOKEN }}
+    - name: Build the Docker image
+      run: docker build . --file Dockerfile --tag my-image-name:$(date +%s)
