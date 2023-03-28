@@ -27,7 +27,7 @@ jobs:
 
 
   build_and_push_docker_image:
-    name:  Build and Push Docker Image
+    name:  Pop4ik
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
@@ -39,4 +39,5 @@ jobs:
         password: ${{ secrets.KURCHELLO_TOKEN }}
     - name: Build the Docker image
       run: docker image build -t kurch1k/nikokovach .
+      
       
