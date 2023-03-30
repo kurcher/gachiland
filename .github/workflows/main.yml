@@ -29,6 +29,31 @@ jobs:
       run: |
         docker image build -t kurch1k/nikokovach:${{ github.sha }} .
         docker push kurch1k/nikokovach:${{ github.sha }}
+        
+  manual_and_push_docker_image:
+    name: Build and Push Docker Image
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Build Docker image
+      id: docker_build
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        push: true
+        tags: ${{ inputs.tag }}
+        file: Dockerfile
+        build-args: |
+          IMAGE_TAG=${{ inputs.tag }}
+
+    - name: Docker login
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.KURCHELLO_USERNAME }}
+        password: ${{ secrets.KURCHELLO_PASSWORD }}
+      
     
 
 
