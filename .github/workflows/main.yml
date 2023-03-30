@@ -27,9 +27,8 @@ jobs:
     - name: Build the Docker image
 
       run: |
- 
-        docker image build -t kurch1k/nikokovach .
-        docker push kurch1k/nikokovach
+        docker image build -t kurch1k/nikokovach:${{ github.sha }} .
+        docker push kurch1k/nikokovach:${{ github.sha }}
     
 
 
