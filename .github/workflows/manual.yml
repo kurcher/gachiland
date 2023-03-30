@@ -7,8 +7,10 @@ on:
         description: 'Name of workflow:'
         required: true
         default: 'shadowmain.yml'
-
-
+      tag:
+        description: 'Docker image tag:'
+        required: true
+        default: 'latest'
 
 jobs:
 
@@ -25,7 +27,7 @@ jobs:
           password: ${{ secrets.KURCHELLO_TOKEN }}
       - name: Build and Push the Docker image
         run: |
-          docker image build -t kurch1k/nikokovach .
-          docker push kurch1k/nikokovach
+          docker image build -t kurch1k/nikokovach:${{ github.event.inputs.tag }} .
+          docker push kurch1k/nikokovach:${{ github.event.inputs.tag }}
    
 
