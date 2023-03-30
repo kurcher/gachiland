@@ -24,11 +24,18 @@ jobs:
       with:
         username: ${{ secrets.KURCHELLO_USERNAME }}
         password: ${{ secrets.KURCHELLO_TOKEN }}
-        tags: my-dockerhub-username/my-docker-image-name:${{ github.sha }}
     - name: Build the Docker image
       run: |
         docker image build -t kurch1k/nikokovach .
         docker push kurch1k/nikokovach
+    - name: Build and Push Docker Image
+      id: docker_build
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        push: true
+        tags: my-dockerhub-username/my-docker-image-name:${{ github.sha }}
+
 
       
       
