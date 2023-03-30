@@ -27,7 +27,7 @@ jobs:
     - name: Build the Docker image
 
       run: |
-        tags: my-dockerhub-username/my-docker-image-name:${{ github.sha }}
+ 
         docker image build -t kurch1k/nikokovach .
         docker push kurch1k/nikokovach
     
