@@ -1,4 +1,4 @@
-name: Build and Push Docker Image
+name: Auto Build and Push Image with hashtag
 
 on:
   push:
@@ -6,22 +6,20 @@ on:
       - master
   workflow_dispatch:
 
+
+
 jobs:
   build_and_push_docker_image:
-    name: Pop4ik
+    name:  Auto Build and Push
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
-      uses: actions/checkout@v2
+      uses: actions/checkout@v3
     - name: Log in to Docker Hub
-      uses: docker/login-action@v1
+      uses: docker/login-action@v2
       with:
         username: ${{ secrets.KURCHELLO_USERNAME }}
         password: ${{ secrets.KURCHELLO_TOKEN }}
-    - name: Build the Docker image
-      run: |
-        docker image build -t kurch1k/nikokovach:${{ github.sha }} .
-        docker push kurch1k/nikokovach:${{ github.sha }}
     - name: Install Trivy
       run: |
           sudo apt-get update
@@ -30,22 +28,27 @@ jobs:
           echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | sudo tee -a /etc/apt/sources.list.d/trivy.list
           sudo apt-get update
           sudo apt-get install trivy -y
-    - name: Scan Docker image with Trivy
+    - name: Build the Docker image
       run: |
-        trivy filesystem --exit-code 1 --format json --output /tmp/trivy-report.json kurch1k/nikokovach:${{ github.sha }}
-      continue-on-error: true
-    - name: Upload Trivy report to Docker Hub artifacts
+        docker image build -t kurch1k/nikokovach:${{ github.sha }} .
+    - name: Scan Docker image
+      run: |
+          trivy image kurch1k/nikokovach:${{ github.sha }} --format json > trivy_report.json
+    - name: Push the Docker image
+      run: |
+        docker push kurch1k/nikokovach:${{ github.sha }}
+
+
+
+    - name: Upload Trivy Report to DockerHub artifacts
       uses: docker/build-push-action@v2
       with:
-        context: .
-        push: false
-        labels: |
-          trivy.severity=high
-          trivy.severity=medium
-          trivy.severity=low
-        builder: docker
-        file: Dockerfile
-        artifacts: /tmp/trivy-report.json
-
+          context: .
+          push: false
+          tags:  kurch1k/nikokovach:${{ github.sha }}
+          outputs: |
+            path=trivy_report.json
+          labels: |
+            trivy_report=true
 
 
