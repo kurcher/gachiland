@@ -41,13 +41,15 @@ jobs:
       run: |
         trivy kurch1k/nikokovach:${{ github.sha }} --format=json --output=/tmp/trivy_report.json
       if: always()
-    - name: Upload Trivy report to DockerHub artifacts
-      uses: docker/build-push-action@v2
+    - name: Upload Trivy report as artifact
+      uses: actions/upload-artifact@v2
       with:
-        context: .
-        push: false
-        file: /tmp/trivy_report.json
-        tags: kurch1k/nikokovach:trivy-report-${{ github.sha }}
+        name: trivy_report
+        path: /tmp/trivy_report.json
+    - name: Pull DockerHub artifact
+      run: |
+        docker pull kurch1k/nikokovach:${{ github.sha }}
+        docker run --rm -v $(pwd):/mnt kurch1k/nikokovach:${{ github.sha }} cp /tmp/trivy_report.json /mnt
  
   
     
