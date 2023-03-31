@@ -37,45 +37,18 @@ jobs:
           echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | sudo tee -a /etc/apt/sources.list.d/trivy.list
           sudo apt-get update
           sudo apt-get install trivy -y
-    
-    - name: Scan Docker image for vulnerabilities
-      uses: aquasecurity/trivy-action@v0.3.0
-      with:
-          image-ref: kurch1k/nikokovach:${{ github.sha }}
-          format: table
-          severity: CRITICAL,HIGH
-      env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    - name: Upload Trivy report as artifact to Docker Hub
+    - name: Check Docker image for vulnerabilities
+      run: |
+        trivy kurch1k/nikokovach:${{ github.sha }} --format=json --output=/tmp/trivy_report.json
+      if: always()
+    - name: Upload Trivy report to DockerHub artifacts
       uses: docker/build-push-action@v2
       with:
-          context: .
-          push: false
-          labels: |
-            org.opencontainers.image.title=Trivy Report
-            org.opencontainers.image.description=Report of vulnerabilities found by Trivy scan
-            org.opencontainers.image.created=${{ github.run_number }}
-          tags: report-${{ github.run_number }}
-          target: report
-          output: type=local,dest=./trivy-report.html
-      env:
-          DOCKER_USERNAME: ${{ secrets.KURCHELLO_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.KURCHELLO_TOKEN }}
-    - name: Publish Trivy report as artifact in Docker Hub
-      uses: docker/build-push-action@v2
-      with:
-          context: .
-          labels: |
-            org.opencontainers.image.title=Trivy Report
-            org.opencontainers.image.description=Report of vulnerabilities found by Trivy scan
-            org.opencontainers.image.created=${{ github.run_number }}
-          tags: report-${{ github.run_number }}
-          target: report
-          secrets: |
-            DOCKER_USERNAME
-            DOCKER_PASSWORD
-          output: type=local,src=./trivy-report.html
-        
+        context: .
+        push: false
+        file: /tmp/trivy_report.json
+        tags: kurch1k/nikokovach:trivy-report-${{ github.sha }}
+ 
   
     
 
