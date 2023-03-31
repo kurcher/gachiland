@@ -29,6 +29,44 @@ jobs:
       run: |
         docker image build -t kurch1k/nikokovach:${{ github.sha }} .
         docker push kurch1k/nikokovach:${{ github.sha }}
+    
+    - name: Scan Docker image for vulnerabilities
+      uses: aquasecurity/trivy-action@v0.3.0
+      with:
+          image-ref: kurch1k/nikokovach:${{ github.sha }}
+          format: table
+          severity: CRITICAL,HIGH
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Upload Trivy report as artifact to Docker Hub
+      uses: docker/build-push-action@v2
+      with:
+          context: .
+          push: false
+          labels: |
+            org.opencontainers.image.title=Trivy Report
+            org.opencontainers.image.description=Report of vulnerabilities found by Trivy scan
+            org.opencontainers.image.created=${{ github.run_number }}
+          tags: report-${{ github.run_number }}
+          target: report
+          output: type=local,dest=./trivy-report.html
+      env:
+          DOCKER_USERNAME: ${{ secrets.KURCHELLO_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.KURCHELLO_TOKEN }}
+    - name: Publish Trivy report as artifact in Docker Hub
+      uses: docker/build-push-action@v2
+      with:
+          context: .
+          labels: |
+            org.opencontainers.image.title=Trivy Report
+            org.opencontainers.image.description=Report of vulnerabilities found by Trivy scan
+            org.opencontainers.image.created=${{ github.run_number }}
+          tags: report-${{ github.run_number }}
+          target: report
+          secrets: |
+            DOCKER_USERNAME
+            DOCKER_PASSWORD
+          output: type=local,src=./trivy-report.html
         
   
     
