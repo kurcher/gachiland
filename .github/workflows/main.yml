@@ -45,7 +45,7 @@ jobs:
         docker push kurch1k/nikokovach:${{ github.sha }}
     - name: Check Docker image for vulnerabilities
       run: |
-        trivy kurch1k/nikokovach:${{ github.sha }} --format json > trivy_report.json
+        trivy image kurch1k/nikokovach:${{ github.sha }} --format json --output trivy_report.json
       if: always()
     - name: Upload Trivy report as artifact
       uses: actions/upload-artifact@v2
@@ -56,3 +56,4 @@ jobs:
       run: |
         docker pull kurch1k/nikokovach:${{ github.sha }}
         docker run --rm -v $(pwd):/mnt kurch1k/nikokovach:${{ github.sha }} cp /tmp/trivy_report.json /mnt
+
