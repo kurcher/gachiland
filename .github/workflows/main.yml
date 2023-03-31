@@ -39,6 +39,10 @@ jobs:
           sudo apt-get install trivy -y
           
           
+    - name: Build the Docker image
+      run: |
+        docker image build -t kurch1k/nikokovach:${{ github.sha }} .
+        docker push kurch1k/nikokovach:${{ github.sha }}
     - name: Check Docker image for vulnerabilities
       run: |
         trivy kurch1k/nikokovach:${{ github.sha }} --format json > trivy_report.json
