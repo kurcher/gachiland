@@ -30,19 +30,19 @@ jobs:
           echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | sudo tee -a /etc/apt/sources.list.d/trivy.list
           sudo apt-get update
           sudo apt-get install trivy -y
-
-  
-  
-
-    - name: Checkout code
-      uses: actions/checkout@v2
-
     - name: Scan Docker image for vulnerabilities
       run: |
           trivy kurch1k/nikokovach:${{ github.sha }} --exit-code 1 --format json | tee trivy-report.json
+    - name: Check if vulnerabilities found
+      run: |
+          if grep -q 'Vulnerabilities' trivy-report.json; then
+            echo "Vulnerabilities found"
+          else
+            echo "All Good"
+          fi
     - name: Upload Trivy report as artifact
+      if: success()
       uses: actions/upload-artifact@v2
       with:
           name: Trivy report
           path: trivy-report.json
- 
