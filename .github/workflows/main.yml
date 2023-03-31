@@ -33,12 +33,12 @@ jobs:
           
     - name: Scan Docker image for vulnerabilities
       run: |
-        trivy kurch1k/nikokovach:${{ github.sha }} --exit-code 1 --format json | tee trivy-report.json
+        trivy kurch1k/nikokovach:${{ github.sha }} --exit-code 1 --format json | tee ${{ github.workspace }}/trivy-report.json
       if: always()
     - name: Upload Trivy report as artifact
       uses: actions/upload-artifact@v2
       with:
         name: Trivy report
-        path: trivy-report.json
+        path: ${{ github.workspace }}/trivy-report.json
           
 
