@@ -42,18 +42,23 @@ jobs:
     - name: Build the Docker image
       run: |
         docker image build -t kurch1k/nikokovach:${{ github.sha }} .
+    - name: Scan Docker image
+      run: |
+          trivy image kurch1k/nikokovach:${{ github.sha }} --format json > trivy_report.json
+    - name: Push the Docker image
+      run: |
         docker push kurch1k/nikokovach:${{ github.sha }}
-    - name: Check Docker image for vulnerabilities
-      run: |
-        trivy image kurch1k/nikokovach:${{ github.sha }} --format json --output trivy_report.json
-      if: always()
-    - name: Upload Trivy report as artifact
-      uses: actions/upload-artifact@v2
+
+
+
+    - name: Upload Trivy Report to DockerHub artifacts
+      uses: docker/build-push-action@v2
       with:
-        name: trivy_report
-        path: trivy_report.json
-    - name: Pull DockerHub artifact
-      run: |
-        docker pull kurch1k/nikokovach:${{ github.sha }}
-        docker run --rm -v $(pwd):/mnt kurch1k/nikokovach:${{ github.sha }} cp /tmp/trivy_report.json /mnt
+          context: .
+          push: false
+          tags:  kurch1k/nikokovach:${{ github.sha }}
+          outputs: |
+            path=trivy_report.json
+          labels: |
+            trivy_report=true
 
