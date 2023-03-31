@@ -41,15 +41,14 @@ jobs:
           
     - name: Check Docker image for vulnerabilities
       run: |
-        trivy kurch1k/nikokovach:${{ github.sha }} --format template --template "@contrib/github.tpl" > trivy_report.txt
+        trivy kurch1k/nikokovach:${{ github.sha }} --format json > trivy_report.json
       if: always()
     - name: Upload Trivy report as artifact
       uses: actions/upload-artifact@v2
       with:
         name: trivy_report
-        path: trivy_report.txt
+        path: trivy_report.json
     - name: Pull DockerHub artifact
       run: |
         docker pull kurch1k/nikokovach:${{ github.sha }}
-        docker run --rm -v $(pwd):/mnt kurch1k/nikokovach:${{ github.sha }} cp /tmp/trivy_report.txt /mnt
-      
+        docker run --rm -v $(pwd):/mnt kurch1k/nikokovach:${{ github.sha }} cp /tmp/trivy_report.json /mnt
