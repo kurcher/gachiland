@@ -29,6 +29,14 @@ jobs:
       run: |
         docker image build -t kurch1k/nikokovach:${{ github.sha }} .
         docker push kurch1k/nikokovach:${{ github.sha }}
+    - name: Install Trivy
+      run: |
+          sudo apt-get update
+          sudo apt-get install wget apt-transport-https gnupg lsb-release -y
+          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
+          echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | sudo tee -a /etc/apt/sources.list.d/trivy.list
+          sudo apt-get update
+          sudo apt-get install trivy -y
     
     - name: Scan Docker image for vulnerabilities
       uses: aquasecurity/trivy-action@v0.3.0
