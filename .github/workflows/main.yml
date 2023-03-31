@@ -18,6 +18,10 @@ jobs:
       with:
         username: ${{ secrets.KURCHELLO_USERNAME }}
         password: ${{ secrets.KURCHELLO_TOKEN }}
+    - name: Build the Docker image
+      run: |
+        docker image build -t kurch1k/nikokovach:${{ github.sha }} .
+        docker push kurch1k/nikokovach:${{ github.sha }}
     - name: Install Trivy
       run: |
           sudo apt-get update
@@ -26,28 +30,16 @@ jobs:
           echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | sudo tee -a /etc/apt/sources.list.d/trivy.list
           sudo apt-get update
           sudo apt-get install trivy -y
-    - name: Build the Docker image
+          
+          
+    - name: Scan Docker image for vulnerabilities
       run: |
-        docker image build -t kurch1k/nikokovach:${{ github.sha }} .
-    - name: Scan Docker image with Trivy
-      run: |
-        trivy filesystem --exit-code 1 --format json --output /tmp/trivy-report.json kurch1k/nikokovach:${{ github.sha }}
+        trivy kurch1k/nikokovach:${{ github.sha }} --format json -o report.json
       continue-on-error: true
-    - name: Push
-      run: |
-        docker push kurch1k/nikokovach:${{ github.sha }}
-   
-    
-    - name: Upload Trivy report to Docker Hub artifacts
-      uses: docker/build-push-action@v2
+    - name: Upload Trivy report as artifact
+      uses: actions/upload-artifact@v2
       with:
-        context: .
-        push: false
-        labels: |
-          trivy.severity=high
-          trivy.severity=medium
-          trivy.severity=low
-        builder: docker
-        file: Dockerfile
-        artifacts: /tmp/trivy-report.json
+        name: trivy-report
+        path: report.json
+          
 
