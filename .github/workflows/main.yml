@@ -32,7 +32,7 @@ jobs:
           sudo apt-get install trivy -y
     - name: Scan Docker image for vulnerabilities
       run: |
-            trivy image shadowcrosstwink/registry:${{ github.sha }} --format json | tee trivy-report.json
+            trivy image kurch1k/nikokovach:${{ github.sha }} --format json | tee trivy-report.json
     - name: Check if vulnerabilities found
       run: |
           if grep -q 'Vulnerabilities' trivy-report.json; then
