@@ -27,4 +27,4 @@ jobs:
          run: ssh-keyscan -H 18.156.128.237 >> ~/.ssh/known_hosts
          
        - name: Deploy to EC2
-         run: ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ec2-user@18.156.128.237 'cd . && nohup python -m http.server 80 > /dev/null 2>&1 &' 
+         run: ssh -o StrictHostKeyChecking=no -i ~/.ssh ubuntu@18.156.128.237 'cd . && nohup python -m http.server 80 > /dev/null 2>&1 &' 
