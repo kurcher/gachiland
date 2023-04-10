@@ -30,4 +30,4 @@ jobs:
         
        - name: Launch on EC2
          run: |
-           ssh  18.156.128.237  'cd . && nohup python -m http.server 80 > /dev/null 2>&1 &'
+              ssh -i "ssh" ubuntu@ec2-18-156-128-237.eu-central-1.compute.amazonaws.com
