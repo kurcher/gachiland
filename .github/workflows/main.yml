@@ -18,6 +18,9 @@ jobs:
        - name: Sync files to S3
          run: |
            aws s3 sync . s3://kurchdeep --delete
+       - name: Add EC2 instance to known_hosts
+         run: ssh-keyscan -H <your-ec2-instance-ip> >> ~/.ssh/known_hosts
+        
        - name: Launch on EC2
          run: |
            ssh  18.156.128.237  'cd . && nohup python -m http.server 80 > /dev/null 2>&1 &'
