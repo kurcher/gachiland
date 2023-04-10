@@ -19,7 +19,7 @@ jobs:
          run: |
            aws s3 sync . s3://kurchdeep --delete
        - name: Add EC2 instance to known_hosts
-         run: ssh-keyscan -H <your-ec2-instance-ip> >> ~/.ssh/known_hosts
+         run: ssh-keyscan -H 18.156.128.237 >> ~/.ssh/known_hosts
         
        - name: Launch on EC2
          run: |
