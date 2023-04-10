@@ -23,7 +23,7 @@ jobs:
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
        - name: Install SSH key
-         run: echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa
+         run: echo "${{ secrets.SSH }}" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa
           
        - name: Add EC2 instance to known_hosts
          run: ssh-keyscan -H 18.156.128.237 >> ~/.ssh/known_hosts
