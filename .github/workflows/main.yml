@@ -18,6 +18,11 @@ jobs:
        - name: Sync files to S3
          run: |
            aws s3 sync . s3://kurchdeep --delete
+       - name: Create SSH directory
+         run: |
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          
        - name: Add EC2 instance to known_hosts
          run: ssh-keyscan -H 18.156.128.237 >> ~/.ssh/known_hosts
         
