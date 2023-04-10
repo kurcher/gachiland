@@ -1,48 +1,23 @@
-name: Build and Push Docker Image
-
+name: Deploy to S3 Bucket and Launch on EC2
 on:
   push:
     branches:
       - master
-  workflow_dispatch:
-
 jobs:
-  build_and_push_docker_image:
-    name: Pop4ik
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v1
-      with:
-        username: ${{ secrets.KURCHELLO_USERNAME }}
-        password: ${{ secrets.KURCHELLO_TOKEN }}
-    - name: Build the Docker image
-      run: |
-        docker image build -t kurch1k/nikokovach:${{ github.sha }} .
-        docker push kurch1k/nikokovach:${{ github.sha }}
-    - name: Install Trivy
-      run: |
-          sudo apt-get update
-          sudo apt-get install wget apt-transport-https gnupg lsb-release -y
-          wget -qO - https://aquasecurity.github.io/trivy-repo/deb/public.key | sudo apt-key add -
-          echo deb https://aquasecurity.github.io/trivy-repo/deb $(lsb_release -sc) main | sudo tee -a /etc/apt/sources.list.d/trivy.list
-          sudo apt-get update
-          sudo apt-get install trivy -y
-    - name: Scan Docker image for vulnerabilities
-      run: |
-            trivy image kurch1k/nikokovach:${{ github.sha }} --format json | tee trivy-report.json
-    - name: Check if vulnerabilities found
-      run: |
-          if grep -q 'Vulnerabilities' trivy-report.json; then
-            echo "Vulnerabilities found"
-          else
-            echo "All Good"
-          fi
-    - name: Upload Trivy report as artifact
-      if: success()
-      uses: actions/upload-artifact@v2
-      with:
-          name: Trivy report
-          path: trivy-report.json
+  deploy:
+   runs-on: ubuntu-latest
+   steps:
+       - name: Checkout
+         uses: actions/checkout@v2
+       - name: Configure AWS credentials
+         uses: aws-actions/configure-aws-credentials@v1
+         with:
+           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+           aws-region: <your-aws-region>
+       - name: Sync files to S3
+         run: |
+           aws s3 sync . s3://<your-s3-bucket> --delete
+       - name: Launch on EC2
+         run: |
+           ssh <your-ec2-instance-ip> 'cd <your-path> && nohup python -m http.server 80 > /dev/null 2>&1 &'
