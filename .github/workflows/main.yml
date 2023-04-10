@@ -14,10 +14,10 @@ jobs:
          with:
            aws-access-key-id: ${{ secrets.AWS_SECRET }}
            aws-secret-access-key: ${{ secrets.AWS_SECRET2 }}
-           aws-region: < eu-central-1 >
+           aws-region:  eu-central-1 
        - name: Sync files to S3
          run: |
            aws s3 sync . s3://kurchdeep --delete
        - name: Launch on EC2
          run: |
-           ssh < 18.156.128.237 > 'cd <.> && nohup python -m http.server 80 > /dev/null 2>&1 &'
+           ssh  18.156.128.237  'cd . && nohup python -m http.server 80 > /dev/null 2>&1 &'
