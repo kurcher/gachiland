@@ -30,4 +30,4 @@ jobs:
         
        - name: Launch on EC2
          run: |
-              ssh -i "ssh" ubuntu@ec2-18-156-128-237.eu-central-1.compute.amazonaws.com
+              ssh -i "SSH" ubuntu@ec2-18-156-128-237.eu-central-1.compute.amazonaws.com
