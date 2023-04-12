@@ -22,6 +22,7 @@ jobs:
            local_dir: './'
            exclude: '!(index.html)'
            bucket_url: ${{ secrets.S3 }}
+           
        - name: Create SSH directory
          run: |
           mkdir -p ~/.ssh
