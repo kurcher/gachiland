@@ -21,10 +21,14 @@ jobs:
           chmod 700 ~/.ssh
           
        - name: Install SSH key
-         run: echo "${{ secrets.SSH }}" > ~/.ssh/id_rsa && chmod 600 ~/.ssh/id_rsa
+         run: |
+          echo "${{ secrets.SSH }}" > ~/.ssh/id_rsa
+          chmod 400 ~/.ssh/id_rsa
          
        - name: Add EC2 host to known_hosts
-         run: ssh-keyscan -H  3.127.217.40 >> ~/.ssh/known_hosts
+         run: |
+          ssh-keyscan -H 3.127.217.40 >> ~/.ssh/known_hosts
          
        - name: Deploy to EC2
-         run: ssh -o StrictHostKeyChecking=no -i ~/.ssh ubuntu@3.127.217.40 'cd . && nohup python -m http.server 80 > /dev/null 2>&1 &' 
+         run: |
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@3.127.217.40 'cd . && nohup python -m http.server 80 > /dev/null 2>&1 &' 
