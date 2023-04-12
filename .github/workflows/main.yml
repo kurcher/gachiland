@@ -17,7 +17,7 @@ jobs:
           aws-region: eu-central-1
       - name: Upload index.html to S3
         run: |
-          aws s3 cp index.html s3://kurchdeep/ --acl public-read
+             aws s3 cp index.html s3://kurchdeep/ --acl bucket-owner-full-control
       - name: Install SSH key
         run: |
           mkdir -p ~/.ssh
