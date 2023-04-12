@@ -14,29 +14,21 @@ jobs:
          with:
            aws-access-key-id: ${{ secrets.AWS_SECRET }}
            aws-secret-access-key: ${{ secrets.AWS_SECRET2 }}
-           aws-region: eu-central-1
-       - name: Upload index.html to S3
-         uses: jakejarvis/s3-sync-action@master
-         with:
-           args: --acl public-read --follow-symlinks --delete
-           local_dir: './'
-           exclude: '!(index.html)'
-           aws_s3_bucket: ${{ secrets.AWS_S3_BUCKET }}
-
+           aws-region:  eu-central-1 
        - name: Create SSH directory
          run: |
           mkdir -p ~/.ssh
           chmod 700 ~/.ssh
-
+          
        - name: Install SSH key
          run: |
           echo "${{ secrets.SSH }}" > ~/.ssh/id_rsa
           chmod 400 ~/.ssh/id_rsa
-
+         
        - name: Add EC2 host to known_hosts
          run: |
           ssh-keyscan -H 3.127.217.40 >> ~/.ssh/known_hosts
-
+         
        - name: Deploy to EC2
          run: |
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ubuntu@3.127.217.40 'cd . && nohup python -m http.server 80 > /dev/null 2>&1 &'
