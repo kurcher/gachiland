@@ -21,7 +21,7 @@ jobs:
            args: --acl public-read --follow-symlinks --delete
            local_dir: './'
            exclude: '!(index.html)'
-           aws_s3_bucket: kurchdeep
+           aws_s3_bucket: ${{ secrets.AWS_S3_BUCKET }}
 
        - name: Create SSH directory
          run: |
