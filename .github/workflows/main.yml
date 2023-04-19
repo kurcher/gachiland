@@ -32,7 +32,7 @@ jobs:
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET2 }}
         AWS_REGION: eu-central-1
         STACK_NAME: "mini-civilization"
-        TEMPLATE_URL: "https://github.com/kurcher/gachiland/blob/master/deploy.yml"
+        TEMPLATE_URL: "https://github.com/kurcher/gachiland/blob/master/kurch.yml"
       run: |
         aws cloudformation create-stack \
           --stack-name $STACK_NAME \
