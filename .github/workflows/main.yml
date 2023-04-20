@@ -25,16 +25,15 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y python3-pip
         sudo pip3 install awscli
-
     - name: Deploy CloudFormation stack
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_SECRET }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET2 }}
         AWS_REGION: eu-central-1
         STACK_NAME: "mini-civilization"
-        TEMPLATE_URL: "https://github.com/kurcher/gachiland/blob/master/kurch.yml"
+        TEMPLATE_URL: "https://github.com/kurcher/gachiland/raw/master/kurch.yml"
       run: |
-        aws cloudformation create-stack \
+        aws cloudformation deploy \
           --stack-name $STACK_NAME \
-          --template-url $TEMPLATE_URL \
+          --template-file $TEMPLATE_URL \
           --capabilities CAPABILITY_NAMED_IAM
