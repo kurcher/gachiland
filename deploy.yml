@@ -16,24 +16,24 @@ Parameters:
     Default: /.github/workflows/
     Description: GitHub directory name
 
-  Resources:
-    S3Bucket:
-      Type: AWS::S3::Bucket
-      Properties:
-        BucketName: bigbucket
-        AccessControl: PublicRead
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: kurchucket
+      AccessControl: PublicRead
 
-    S3BucketPolicy:
-      Type: AWS::S3::BucketPolicy
-      Properties:
-        Bucket: !Ref S3Bucket
+  S3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref S3Bucket
       PolicyDocument:
         Statement:
-            - Sid: PublicReadForGetBucketObjects
-              Effect: Allow
-              Principal: ""
-              Action: "s3:GetObject"
-              Resource: !Join [ '', [ "arn:aws:s3:::", !Ref S3Bucket, "/" ] ]
+          - Sid: PublicReadForGetBucketObjects
+            Effect: Allow
+            Principal: "*"
+            Action: "s3:GetObject"
+            Resource: !Join [ '', [ "arn:aws:s3:::", !Ref S3Bucket, "/*" ] ]
 
   S3BucketIndexObject:
     Type: AWS::S3::Object
@@ -41,7 +41,16 @@ Parameters:
       Bucket: !Ref S3Bucket
       Key: index.html
       ContentType: text/html
-      Source: https://raw.githubusercontent.com/$%7BGitHubUser%7D/$%7BGitHubRepo%7D/$%7BGitHubBranch%7D/index.html
+      Body: |-
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <title>Hello World</title>
+          </head>
+          <body>
+            <h1>Hello World!</h1>
+          </body>
+        </html>
 
   CloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
@@ -61,6 +70,4 @@ Parameters:
           TargetOriginId: S3BucketOrigin
           ForwardedValues:
             QueryString: false
-          ViewerProtocolPolicy: redirect-to-https
-        ViewerCertificate:
-          CloudFrontDefaultCertificate: true
+          ViewerProtocolPolicy:
