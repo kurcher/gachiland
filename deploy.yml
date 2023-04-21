@@ -20,7 +20,7 @@ Resources:
   S3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: bigbucket
+      BucketName: kurchucket
       AccessControl: PublicRead
 
   S3BucketPolicy:
@@ -37,31 +37,62 @@ Resources:
             Resource: !Join ['', ['arn:aws:s3:::', !Ref S3Bucket, '/*']]
 
   S3BucketIndexObject:
-    Type: AWS::S3::Object
+    Type: AWS::S3::Bucket
     Properties:
-      Bucket: !Ref S3Bucket
-      Key: index.html
-      ContentType: text/html
-      Source: https://raw.githubusercontent.com/$%7BGitHubUser%7D/$%7BGitHubRepo%7D/$%7BGitHubBranch%7D/index.html
+      BucketName: !Ref S3Bucket
+      WebsiteConfiguration:
+        IndexDocument: index.html
+      Tags:
+        - Key: Name
+          Value: S3BucketIndexObject
+      DeletionPolicy: Retain
 
-  CloudFrontDistribution:
-    Type: AWS::CloudFront::Distribution
+  S3BucketIndexObjectDeployment:
+    Type: AWS::Lambda::Function
     Properties:
-      DistributionConfig:
-        Origins:
-          - DomainName: !GetAtt [S3Bucket, DomainName]
-            Id: S3BucketOrigin
-            S3OriginConfig:
-              OriginAccessIdentity: ""
-        DefaultRootObject: index.html
-        Enabled: true
-        DefaultCacheBehavior:
-          AllowedMethods:
-            - GET
-            - HEAD
-          TargetOriginId: S3BucketOrigin
-          ForwardedValues:
-            QueryString: false
-          ViewerProtocolPolicy: redirect-to-https
-        ViewerCertificate:
-          CloudFrontDefaultCertificate: true
+      Code:
+        ZipFile: |
+          import boto3
+          import os
+          import shutil
+          import tempfile
+          
+          s3 = boto3.resource('s3')
+          github_user = os.environ['GitHubUser']
+          github_repo = os.environ['GitHubRepo']
+          github_branch = os.environ['GitHubBranch']
+          key = 'index.html'
+          
+          with tempfile.TemporaryDirectory() as tmp_dir:
+              path = os.path.join(tmp_dir, key)
+              url = f'https://raw.githubusercontent.com/{github_user}/{github_repo}/{github_branch}/{key}'
+              s3.Bucket(os.environ['S3Bucket']).download_file(key, path)
+              shutil.copy(path, '/var/task/index.html')
+          
+      Handler: index.lambda_handler
+      Role: !GetAtt [S3BucketIndexObjectDeploymentRole, Arn]
+      Runtime: python3.8
+
+  S3BucketIndexObjectDeploymentRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: S3ReadWrite
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:PutObject
+                  - s3:GetObject
+                  - s3:ListBucket
+                  - s3:DeleteObject
+                  - s3:GetBucketWebsite
+                Resource: !Join ['', ['arn:aws:s3:::', !Ref S3Bucket, '/*']]
