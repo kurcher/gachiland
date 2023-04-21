@@ -1,11 +1,11 @@
 Parameters:
   GitHubUser:
     Type: String
-    Default: ShadowOpsCross 
+    Default: kurch1k
     Description: GitHub username
   GitHubRepo:
     Type: String
-    Default: ThatsIT
+    Default: gachiland
     Description: GitHub repository name
   GitHubBranch:
     Type: String
@@ -20,7 +20,7 @@ Parameters:
     S3Bucket:
       Type: AWS::S3::Bucket
       Properties:
-        BucketName: shadowbowlen
+        BucketName: bigbucket
         AccessControl: PublicRead
 
     S3BucketPolicy:
