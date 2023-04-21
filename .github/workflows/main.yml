@@ -31,7 +31,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{ secrets.ACCESS }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.SECRET }}
           AWS_REGION: eu-central-1
-          STACK_NAME: "mini-civilization2"
+          STACK_NAME: "kurchland"
         run: |
           aws cloudformation create-stack \
           --stack-name $STACK_NAME \
