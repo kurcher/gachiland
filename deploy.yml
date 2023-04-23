@@ -2,19 +2,19 @@ Parameters:
   GitHubUser:
     Type: String
     Default: kurch1k
-    Description: GitHub username
+    Description: kurch1k
   GitHubRepo:
     Type: String
     Default: gachiland
-    Description: GitHub repository name
+    Description: gachiland
   GitHubBranch:
     Type: String
     Default: master
-    Description: GitHub repository branch name
+    Description: master
   GitHubDirectory:
     Type: String
     Default: /.github/workflows/
-    Description: GitHub directory name
+    Description: gachiland
 
 Resources:
   S3Bucket:
@@ -95,4 +95,15 @@ Resources:
                   - s3:ListBucket
                   - s3:DeleteObject
                   - s3:GetBucketWebsite
-                Resource: !Join ['', ['arn:aws:s3:::', !Ref S3Bucket, '/*']]]
+                Resource: !Join ['', ['arn:aws:s3:::', !Ref S3Bucket, '/*']]          
+
+  CloudFrontDistribution:
+    Type: "AWS::CloudFront::Distribution"
+    Properties:
+      DistributionConfig:
+        Origins:
+          - Id: my-bucket
+            DomainName: !GetAtt S3Bucket.WebsiteURL
+            S3OriginConfig:
+              OriginAccessIdentity: ""
+        Enabled: true
