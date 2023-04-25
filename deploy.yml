@@ -9,7 +9,7 @@ Parameters:
     Description: gachiland
   GitHubBranch:
     Type: String
-    Default: master
+    Default: master 
     Description: master
   GitHubDirectory:
     Type: String
