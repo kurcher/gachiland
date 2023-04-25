@@ -37,11 +37,12 @@ Resources:
             Resource: !Join ['', ['arn:aws:s3:::', !Ref S3Bucket, '/*']]
 
   S3BucketIndexObject:
-    Type: AWS::S3::Bucket
+    Type: AWS::S3::BucketWebsiteConfiguration
     Properties:
-      BucketName: !Ref S3Bucket
+      Bucket: !Ref S3Bucket
       WebsiteConfiguration:
         IndexDocument: index.html
+        ErrorDocument: error.html
       Tags:
         - Key: Name
           Value: S3BucketIndexObject
@@ -68,42 +69,50 @@ Resources:
               url = f'https://raw.githubusercontent.com/{github_user}/{github_repo}/{github_branch}/{key}'
               s3.Bucket(os.environ['S3Bucket']).download_file(key, path)
               shutil.copy(path, '/var/task/index.html')
-          
+              
+      Environment:
+        Variables:
+          S3Bucket: !Ref S3Bucket
+          GitHubUser: !Ref GitHubUser
+          GitHubRepo: !Ref GitHubRepo
+          GitHubBranch: !Ref GitHubBranch
       Handler: index.lambda_handler
       Role: !GetAtt [S3BucketIndexObjectDeploymentRole, Arn]
       Runtime: python3.8
 
   S3BucketIndexObjectDeploymentRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: 2012-10-17
+    Type
+AWS::IAM::Role
+Properties:
+  AssumeRolePolicyDocument:
+    Version: '2012-10-17'
+    Statement:
+      - Effect: Allow
+        Principal:
+          Service: lambda.amazonaws.com
+        Action:
+          - 'sts:AssumeRole'
+  Path: '/'
+  Policies:
+    - PolicyName: S3BucketGetObject
+      PolicyDocument:
+        Version: '2012-10-17'
         Statement:
           - Effect: Allow
-            Principal:
-              Service: lambda.amazonaws.com
-            Action: sts:AssumeRole
-      Policies:
-        - PolicyName: S3ReadWrite
-          PolicyDocument:
-            Version: 2012-10-17
-            Statement:
-              - Effect: Allow
-                Action:
-                  - s3:PutObject
-                  - s3:GetObject
-                  - s3:ListBucket
-                  - s3:DeleteObject
-                  - s3:GetBucketWebsite
-                Resource: !Join ['', ['arn:aws:s3:::', !Ref S3Bucket, '/*']]          
-
-  CloudFrontDistribution:
-    Type: "AWS::CloudFront::Distribution"
-    Properties:
-      DistributionConfig:
-        Origins:
-          - Id: my-bucket
-            DomainName: !GetAtt S3Bucket.WebsiteURL
-            S3OriginConfig:
-              OriginAccessIdentity: ""
-        Enabled: true
+            Action:
+              - 's3:GetObject'
+            Resource:
+              - !Join ['', ['arn:aws:s3:::', !Ref S3Bucket, '/*']]
+    - PolicyName: CloudWatchLogs
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Action:
+              - 'logs:CreateLogGroup'
+              - 'logs:CreateLogStream'
+              - 'logs:PutLogEvents'
+            Resource: 'arn:aws:logs:*:*:*'
+  Tags:
+    - Key: Name
+      Value: S3BucketIndexObjectDeploymentRole
