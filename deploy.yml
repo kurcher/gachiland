@@ -23,7 +23,7 @@ Resources:
       Key: "index.html"
       ContentType: "text/html"
       Body: !Sub |
-        { "Fn::ImportValue": "${GitHubExportName}-Content" }
+        { "Fn::ImportValue": "${kurch1k}-Content" }
 
   CloudFrontDistribution:
     Type: "AWS::CloudFront::Distribution"
