@@ -1,130 +1,47 @@
-Parameters:
-  GitHubUser:
-    Type: String
-    Default: kurch1k
-    Description: kurch1k
-  GitHubRepo:
-    Type: String
-    Default: gachiland
-    Description: gachiland
-  GitHubBranch:
-    Type: String
-    Default: master 
-    Description: master
-  GitHubDirectory:
-    Type: String
-    Default: /.github/workflows/
-    Description: gachiland
-
 Resources:
   S3Bucket:
-    Type: AWS::S3::Bucket
-    Properties:
-      BucketName: kurchucket
+    Type: "AWS::S3::Bucket"
+    Properties: 
+      BucketName: "kurchucket"
       AccessControl: PublicRead
 
   S3BucketPolicy:
-    Type: AWS::S3::BucketPolicy
+    Type: "AWS::S3::BucketPolicy"
     Properties:
       Bucket: !Ref S3Bucket
       PolicyDocument:
         Statement:
-          - Sid: PublicReadForGetBucketObjects
-            Effect: Allow
+          - Effect: Allow
             Principal: "*"
-            Action:
-              - "s3:GetObject"
-            Resource: !Join ['', ['arn:aws:s3:::', !Ref S3Bucket, '/*']]
+            Action: s3:GetObject
+            Resource: !Join ['', ["arn:aws:s3:::", !Ref S3Bucket, "/*"]]
 
-  S3BucketIndexObject:
-    Type: AWS::S3::BucketWebsiteConfiguration
+  S3IndexObject:
+    Type: "AWS::S3::Object"
     Properties:
       Bucket: !Ref S3Bucket
-      WebsiteConfiguration:
-        IndexDocument: index.html
-        ErrorDocument: error.html
-      Tags:
-        - Key: Name
-          Value: S3BucketIndexObject
-      DeletionPolicy: Retain
+      Key: "index.html"
+      ContentType: "text/html"
+      SourceUrl: "https://raw.githubusercontent.com/<kurch1k>/<gachiland>/<master>/index.html"
 
-  S3BucketIndexObjectDeployment:
-    Type: AWS::Lambda::Function
+  CloudFrontDistribution:
+    Type: "AWS::CloudFront::Distribution"
     Properties:
-      Code:
-        ZipFile: |
-          import boto3
-          import os
-          import shutil
-          import tempfile
-          
-          s3 = boto3.resource('s3')
-          github_user = os.environ['GitHubUser']
-          github_repo = os.environ['GitHubRepo']
-          github_branch = os.environ['GitHubBranch']
-          key = 'index.html'
-          
-          with tempfile.TemporaryDirectory() as tmp_dir:
-              path = os.path.join(tmp_dir, key)
-              url = f'https://raw.githubusercontent.com/{github_user}/{github_repo}/{github_branch}/{key}'
-              s3.Bucket(os.environ['S3Bucket']).download_file(key, path)
-              shutil.copy(path, '/var/task/index.html')
-              
-      Environment:
-        Variables:
-          S3Bucket: !Ref S3Bucket
-          GitHubUser: !Ref GitHubUser
-          GitHubRepo: !Ref GitHubRepo
-          GitHubBranch: !Ref GitHubBranch
-      Handler: index.lambda_handler
-      Role: !GetAtt [S3BucketIndexObjectDeploymentRole, Arn]
-      Runtime: python3.8
-
-  S3BucketIndexObjectDeploymentRole:
-    Type:
-      AWS::IAM::Role
-  Properties:
-  AssumeRolePolicyDocument:
-    Version: '2012-10-17'
-    Statement:
-      - Effect: Allow
-        Principal:
-          Service: lambda.amazonaws.com
-        Action:
-          - 'sts:AssumeRole'
-  Path: '/'
-  Policies:
-    - PolicyName: S3BucketGetObject
-      PolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Action:
-              - 's3:GetObject'
-            Resource:
-              - !Join ['', ['arn:aws:s3:::', !Ref S3Bucket, '/*']]
-    - PolicyName: CloudWatchLogs
-      PolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Action:
-              - 'logs:CreateLogGroup'
-              - 'logs:CreateLogStream'
-              - 'logs:PutLogEvents'
-            Resource: 'arn:aws:logs:*:*:*'
-  Tags:
-    - Key: Name
-      Value: S3BucketIndexObjectDeploymentRole
-      S3BucketIndexObjectDeploymentPermission:
-      Type: AWS::Lambda::Permission
-      Properties:
-      Action: 'lambda:InvokeFunction'
-      FunctionName: !Ref S3BucketIndexObjectDeployment
-      Principal: s3.amazonaws.com
-      SourceAccount: !Ref 'AWS::AccountId'
-      SourceArn: !Join ['', ['arn:aws:s3:::', !Ref S3Bucket]]
-
-      Outputs:
-      S3BucketName:
-      Value: !Ref S3Bucket
+      DistributionConfig:
+        Enabled: true
+        Origins:
+          - DomainName: !GetAtt S3Bucket.DomainName
+            Id: S3Origin
+            S3OriginConfig:
+              OriginAccessIdentity: ""
+        DefaultRootObject: "index.html"
+        DefaultCacheBehavior:
+          TargetOriginId: "S3Origin"
+          ForwardedValues:
+            QueryString: false
+            Cookies:
+              Forward: none
+          ViewerProtocolPolicy: "allow-all"
+        Aliases:
+          - "example.com"
+          - "www.example.com"
