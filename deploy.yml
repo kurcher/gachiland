@@ -17,12 +17,13 @@ Resources:
             Resource: !Join ['', ["arn:aws:s3:::", !Ref S3Bucket, "/*"]]
 
   S3IndexObject:
-    Type: "AWS::S3::Object"
+    Type: "AWS::S3::Bucket"
     Properties:
       Bucket: !Ref S3Bucket
       Key: "index.html"
       ContentType: "text/html"
-      SourceUrl: "https://raw.githubusercontent.com/<kurch1k>/<gachiland>/<master>/index.html"
+      Body: !Sub |
+        { "Fn::ImportValue": "${GitHubExportName}-Content" }
 
   CloudFrontDistribution:
     Type: "AWS::CloudFront::Distribution"
