@@ -1,48 +1,48 @@
 Resources:
   S3Bucket:
-    Type: "AWS::S3::Bucket"
-    Properties: 
-      BucketName: "kurchucket"
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: kurchucket
       AccessControl: PublicRead
 
   S3BucketPolicy:
-    Type: "AWS::S3::BucketPolicy"
+    Type: AWS::S3::BucketPolicy
     Properties:
       Bucket: !Ref S3Bucket
       PolicyDocument:
+        Version: '2012-10-17'
         Statement:
-          - Effect: Allow
-            Principal: "*"
-            Action: s3:GetObject
-            Resource: !Join ['', ["arn:aws:s3:::", !Ref S3Bucket, "/*"]]
+        - Sid: PublicReadGetObject
+          Effect: Allow
+          Principal: '*'
+          Action: s3:GetObject
+          Resource: !Join [ '', [ 'arn:aws:s3:::', !Ref S3Bucket, '/*' ] ]
 
-  S3IndexObject:
-    Type: "AWS::S3::Bucket"
+  S3Object:
+    Type: AWS::S3::Object
     Properties:
       Bucket: !Ref S3Bucket
-      Key: "index.html"
-      ContentType: "text/html"
-      Body: !Sub |
-        { "Fn::ImportValue": "${kurch1k}-Content" }
+      Key: index.html
+      ContentType: text/html
+      SourceUrl: !Sub 'https://raw.githubusercontent.com/myuser/myrepo/master/index.html'
 
   CloudFrontDistribution:
-    Type: "AWS::CloudFront::Distribution"
+    Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig:
         Enabled: true
         Origins:
-          - DomainName: !GetAtt S3Bucket.DomainName
-            Id: S3Origin
-            S3OriginConfig:
-              OriginAccessIdentity: ""
-        DefaultRootObject: "index.html"
+        - DomainName: !GetAtt S3Bucket.DomainName
+          Id: S3Origin
+          S3OriginConfig:
+            OriginAccessIdentity: ''
         DefaultCacheBehavior:
-          TargetOriginId: "S3Origin"
+          TargetOriginId: S3Origin
+          ViewerProtocolPolicy: allow-all
           ForwardedValues:
             QueryString: false
             Cookies:
               Forward: none
-          ViewerProtocolPolicy: "allow-all"
+        DefaultRootObject: index.html
         Aliases:
-          - "example.com"
-          - "www.example.com"
+        - my-example-domain.com
