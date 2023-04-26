@@ -7,7 +7,7 @@ Resources:
 
   S3Object:
     Type: AWS::S3::Object
-    Properties:
+    Properties: 
       Bucket: !Ref S3Bucket
       Key: index.html
       SourceObject: https://raw.githubusercontent.com/<kurch1k>/<gachiland/<master>/index.html
