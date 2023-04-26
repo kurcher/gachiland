@@ -1,8 +1,8 @@
-Resources:
+esources:
   S3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      AccessControl: PublicRead
+      BucketName: my-example-bucket
       WebsiteConfiguration:
         IndexDocument: index.html
 
