@@ -2,29 +2,9 @@ Resources:
   S3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: kurchucket
       AccessControl: PublicRead
-
-  S3BucketPolicy:
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket: !Ref S3Bucket
-      PolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-        - Sid: PublicReadGetObject
-          Effect: Allow
-          Principal: '*'
-          Action: s3:GetObject
-          Resource: !Join [ '', [ 'arn:aws:s3:::', !Ref S3Bucket, '/*' ] ]
-
-  S3Object:
-    Type: AWS::S3::Object
-    Properties:
-      Bucket: !Ref S3Bucket
-      Key: index.html
-      ContentType: text/html
-      SourceUrl: !Sub 'https://raw.githubusercontent.com/myuser/myrepo/master/index.html'
+      WebsiteConfiguration:
+        IndexDocument: index.html
 
   CloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
