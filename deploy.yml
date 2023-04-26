@@ -2,27 +2,40 @@ Resources:
   S3Bucket:
     Type: AWS::S3::Bucket
     Properties:
-      BucketName: my-example-bucket
-      WebsiteConfiguration:
-        IndexDocument: index.html
+      BucketName: kurchucket
+      AccessControl: PublicRead
+
+  S3Object:
+    Type: AWS::S3::Object
+    Properties:
+      Bucket: !Ref S3Bucket
+      Key: index.html
+      SourceObject: https://raw.githubusercontent.com/<kurch1k>/<gachiland/<master>/index.html
 
   CloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig:
-        Enabled: true
         Origins:
-        - DomainName: !GetAtt S3Bucket.DomainName
-          Id: S3Origin
-          S3OriginConfig:
-            OriginAccessIdentity: ''
+          - DomainName: !GetAtt S3Bucket.DomainName
+            Id: S3Origin
+            S3OriginConfig:
+              OriginAccessIdentity: ""
         DefaultCacheBehavior:
-          TargetOriginId: S3Origin
-          ViewerProtocolPolicy: allow-all
+          AllowedMethods:
+            - GET
+            - HEAD
+            - OPTIONS
+          Compress: true
           ForwardedValues:
             QueryString: false
             Cookies:
               Forward: none
-        DefaultRootObject: index.html
-        Aliases:
-        - my-example-domain.com
+          TargetOriginId: S3Origin
+          ViewerProtocolPolicy: redirect-to-https
+        Enabled: true
+
+Outputs:
+  CloudFrontURL:
+    Value: !Join ['', ['https://', !GetAtt CloudFrontDistribution.DomainName, '/', 'index.html']]
+    Description: URL of the index.html file served by CloudFront
