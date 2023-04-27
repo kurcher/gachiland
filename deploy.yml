@@ -6,7 +6,7 @@ Resources:
       AccessControl: PublicRead
 
   S3Object:
-    Type: AWS::S3::Object
+    Type: AWS::S3::Bucket
     Properties:
       Bucket: !Ref S3Bucket
       Key: index.html
