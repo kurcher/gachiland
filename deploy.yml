@@ -4,23 +4,46 @@ Resources:
     Properties:
       BucketName: kurchucket
       AccessControl: PublicRead
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      Tags:
+        - Key: Name
+          Value: MyS3Bucket
+    DeletionPolicy: Retain
+
+  S3BucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref S3Bucket
+      PolicyDocument:
+        Statement:
+          - Action:
+              - s3:GetObject
+            Effect: Allow
+            Principal: "*"
+            Resource: !Join ['', ['arn:aws:s3:::', !Ref S3Bucket, '/*']]
+        Version: "2012-10-17"
 
   S3Object:
     Type: AWS::S3::Bucket
-    Properties:
+    Properties: 
       Bucket: !Ref S3Bucket
       Key: index.html
-      WebsiteRedirectLocation: https://github.com/kurcher/gachiland/blob/master/index.html
+      SourceObject: https://raw.githubusercontent.com/<kurch1k>/<gachiland>/<master>/index.html
 
   CloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig:
+        Comment: CloudFront Distribution for S3 Bucket
+        Enabled: true
         Origins:
           - DomainName: !GetAtt S3Bucket.DomainName
             Id: S3Origin
             S3OriginConfig:
-              OriginAccessIdentity: ""
+              OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${CloudFrontPublicKey}"
         DefaultCacheBehavior:
           AllowedMethods:
             - GET
@@ -33,9 +56,55 @@ Resources:
               Forward: none
           TargetOriginId: S3Origin
           ViewerProtocolPolicy: redirect-to-https
-        Enabled: true
 
-Outputs:
-  CloudFrontURL:
-    Value: !Join ['', ['https://', !GetAtt CloudFrontDistribution.DomainName, '/', 'index.html']]
-    Description: URL of the index.html file served by CloudFront
+  CloudFrontPublicKey:
+    Type: AWS::CloudFront::PublicKey
+    Properties:
+      PublicKeyConfig:
+        CallerReference: !Sub "${AWS::StackName}-cloudfront-public-key"
+        Comment: Public key for CloudFront distribution
+        EncodedKey: !Ref CloudFrontPublicKeyContent
+
+  CloudFrontPublicKeyContent:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: cloudfront-public-key
+      Type: SecureString
+      Value: cloudfront-public-key-value
+
+  S3BucketPolicyDocument:
+    Type: "AWS::IAM::Policy"
+    Properties:
+      PolicyName: "S3BucketAccessPolicy"
+      PolicyDocument:
+        Statement:
+          - Effect: "Allow"
+            Action:
+              - "s3:GetObject"
+            Resource: !Join ['', ['arn:aws:s3:::', !Ref S3Bucket, '/*']]
+        Version: "2012-10-17"
+      Roles:
+        - !Ref S3BucketRole
+
+  S3BucketRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+        - Effect: "Allow"
+          Principal:
+            Service: "s3.amazonaws.com"
+          Action: "sts:AssumeRole"
+      Path: "/"
+      Policies:
+        - PolicyName: "S3BucketAccessPolicy"
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: "Allow"
+                Action:
+                  - "s3:GetObject"
+                Resource: !Join ['', ['arn:aws:s3:::', !Ref S3Bucket, '/*']]
+      Tags:
+        - Key: "Name"
