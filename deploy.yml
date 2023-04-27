@@ -65,12 +65,7 @@ Resources:
         Comment: Public key for CloudFront distribution
         EncodedKey: !Ref CloudFrontPublicKeyContent
 
-  CloudFrontPublicKeyContent:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: cloudfront-public-key
-      Type: SecureString
-      Value: cloudfront-public-key-value
+ 
 
   S3BucketPolicyDocument:
     Type: "AWS::IAM::Policy"
