@@ -57,13 +57,6 @@ Resources:
           TargetOriginId: S3Origin
           ViewerProtocolPolicy: redirect-to-https
 
-  CloudFrontPublicKey:
-    Type: AWS::CloudFront::PublicKey
-    Properties:
-      PublicKeyConfig:
-        CallerReference: !Sub "${AWS::StackName}-cloudfront-public-key"
-        Comment: Public key for CloudFront distribution
-        EncodedKey: !Ref CloudFrontPublicKeyContent
 
  
 
