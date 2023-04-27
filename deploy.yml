@@ -1,23 +1,23 @@
 Resources:
   S3Bucket:
-    Type: AWS::S3::Bucket 
+    Type: AWS::S3::Bucket
     Properties:
       BucketName: kurchucket
       AccessControl: PublicRead
 
   S3Object:
     Type: AWS::S3::Object
-    Properties: 
+    Properties:
       Bucket: !Ref S3Bucket
       Key: index.html
-      SourceObject: https://raw.githubusercontent.com/<kurch1k>/<gachiland/<master>/index.html
+      WebsiteRedirectLocation: https://github.com/kurcher/gachiland/blob/master/index.html
 
   CloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
     Properties:
       DistributionConfig:
         Origins:
-          - DomainName: !GetAtt S3Bucket.DomainName
+          - DomainName: !GetAtt S3Bucket.kurch1k
             Id: S3Origin
             S3OriginConfig:
               OriginAccessIdentity: ""
