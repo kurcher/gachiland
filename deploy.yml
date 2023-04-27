@@ -6,7 +6,7 @@ Resources:
       AccessControl: PublicRead
       BucketEncryption:
         ServerSideEncryptionConfiguration:
-          - ServerSideEncryptionByDefault:
+          - ServerSideEncryptionByDefault: 
               SSEAlgorithm: AES256
       Tags:
         - Key: Name
