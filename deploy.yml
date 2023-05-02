@@ -1,103 +1,46 @@
 Resources:
-  S3Bucket:
-    Type: AWS::S3::Bucket
-    Properties: 
+  MyS3Bucket:
+    Type: 'AWS::S3::Bucket'
+    Properties:
       BucketName: kurchucket
       AccessControl: PublicRead
-      BucketEncryption:
-        ServerSideEncryptionConfiguration:
-          - ServerSideEncryptionByDefault: 
-              SSEAlgorithm: AES256
-      Tags:
-        - Key: Ars
-          Value: MyS3Bucket
-    DeletionPolicy: Retain
+      WebsiteConfiguration:
+        IndexDocument: index.html
 
-  S3BucketPolicy:
-    Type: AWS::S3::BucketPolicy
+  MyBucketPolicy:
+    Type: 'AWS::S3::BucketPolicy'
     Properties:
-      Bucket: !Ref S3Bucket
+      Bucket: !Ref MyS3Bucket
       PolicyDocument:
         Statement:
-          - Action:
-              - s3:GetObject
-            Effect: Allow
+          - Effect: Allow
+            Action: s3:GetObject
+            Resource: arn:aws:s3:::kurchucket/*
             Principal: "*"
-            Resource: !Join ['', ['arn:aws:s3:::', !Ref S3Bucket, '/*']]
-        Version: "2012-10-17"
 
-  S3Object:
-    Type: AWS::S3::Bucket
-    Properties: 
-      Bucket: !Ref S3Bucket
-      Key: index.html
-      SourceObject: https://raw.githubusercontent.com/<kurch1k>/<gachiland>/<master>/index.html
-
-  CloudFrontDistribution:
-    Type: AWS::CloudFront::Distribution
+  MyCloudFrontDistribution:
+    Type: 'AWS::CloudFront::Distribution'
     Properties:
       DistributionConfig:
-        Comment: CloudFront Distribution for S3 Bucket
-        Enabled: true
         Origins:
-          - DomainName: !GetAtt S3Bucket.DomainName
-            Id: S3Origin
+          - DomainName: !GetAtt MyS3Bucket.DomainName
+            Id: MyS3BucketOrigin
             S3OriginConfig:
-              OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${CloudFrontPublicKey}"
+              OriginAccessIdentity: ''
+        Enabled: true
+        DefaultRootObject: index.html
         DefaultCacheBehavior:
           AllowedMethods:
+            - DELETE
             - GET
             - HEAD
             - OPTIONS
-          Compress: true
+            - PATCH
+            - POST
+            - PUT
+          TargetOriginId: MyS3BucketOrigin
           ForwardedValues:
             QueryString: false
             Cookies:
               Forward: none
-          TargetOriginId: S3Origin
           ViewerProtocolPolicy: redirect-to-https
-
-
- 
-
-  S3BucketPolicyDocument:
-    Type: "AWS::IAM::Policy"
-    Properties:
-      PolicyName: "S3BucketAccessPolicy"
-      PolicyDocument:
-        Statement:
-          - Effect: "Allow"
-            Action:
-              - "s3:GetObject"
-            Resource: !Join ['', ['arn:aws:s3:::', !Ref S3Bucket, '/*']]
-        Version: "2012-10-17"
-      Roles:
-        - !Ref S3BucketRole
-
-  S3BucketRole:
-    Type: "AWS::IAM::Role"
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: "2012-10-17"
-        Statement:
-        - Effect: "Allow"
-          Principal:
-            Service: "s3.amazonaws.com"
-          Action: "sts:AssumeRole"
-      Path: "/"
-      Policies:
-        - PolicyName: "S3BucketAccessPolicy"
-          PolicyDocument:
-            Version: "2012-10-17"
-            Statement:
-              - Effect: "Allow"
-                Action:
-                  - "s3:GetObject"
-                Resource: !Join ['', ['arn:aws:s3:::', !Ref S3Bucket, '/*']]
-      Tags:
-        - Key: "Ars2"
-
-Parameters:
-  CloudFrontPublicKey:
-    Type: String
-    Description: CloudFront public key ID
