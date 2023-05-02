@@ -17,7 +17,7 @@ Resources:
           Resource: !Join ['', ['arn:aws:s3:::', !Ref MyBucket, '/*']]
 
   MyObject:
-    Type: 'AWS::S3::Object'
+    Type: 'AWS::S3::Bucket'
     Properties:
       Bucket: !Ref MyBucket
       Key: index.html
