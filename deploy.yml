@@ -1,46 +1,52 @@
 Resources:
-  MyS3Bucket:
+  MyBucket:
     Type: 'AWS::S3::Bucket'
     Properties:
-      BucketName: kurchucket
       AccessControl: PublicRead
-      WebsiteConfiguration:
-        IndexDocument: index.html
 
   MyBucketPolicy:
     Type: 'AWS::S3::BucketPolicy'
     Properties:
-      Bucket: !Ref MyS3Bucket
+      Bucket: !Ref MyBucket
       PolicyDocument:
         Statement:
-          - Effect: Allow
-            Action: s3:GetObject
-            Resource: arn:aws:s3:::kurchucket/*
-            Principal: "*"
+        - Sid: PublicReadGetObject
+          Effect: Allow
+          Principal: '*'
+          Action: 's3:GetObject'
+          Resource: !Join ['', ['arn:aws:s3:::', !Ref MyBucket, '/*']]
 
-  MyCloudFrontDistribution:
+  MyObject:
+    Type: 'AWS::S3::Object'
+    Properties:
+      Bucket: !Ref MyBucket
+      Key: index.html
+      Source:
+        Url: https://raw.githubusercontent.com/kurch1k/gachiland/master/.github/workflows/index.html
+
+  MyDistribution:
     Type: 'AWS::CloudFront::Distribution'
     Properties:
       DistributionConfig:
         Origins:
-          - DomainName: !GetAtt MyS3Bucket.DomainName
-            Id: MyS3BucketOrigin
-            S3OriginConfig:
-              OriginAccessIdentity: ''
+        - DomainName: !GetAtt MyBucket.RegionalDomainName
+          Id: MyOrigin
+          S3OriginConfig:
+            OriginAccessIdentity: ''
         Enabled: true
         DefaultRootObject: index.html
         DefaultCacheBehavior:
           AllowedMethods:
-            - DELETE
-            - GET
-            - HEAD
-            - OPTIONS
-            - PATCH
-            - POST
-            - PUT
-          TargetOriginId: MyS3BucketOrigin
+          - GET
+          - HEAD
+          CachedMethods:
+          - GET
+          - HEAD
+          Compress: true
+          DefaultTTL: 86400
           ForwardedValues:
-            QueryString: false
             Cookies:
               Forward: none
-          ViewerProtocolPolicy: redirect-to-https
+            QueryString: false
+          TargetOriginId: MyOrigin
+        ViewerProtocolPolicy: redirect-to-https
