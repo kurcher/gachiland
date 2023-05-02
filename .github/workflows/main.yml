@@ -1,14 +1,15 @@
-name: Deploy CloudFormation Stack
+name: Deploy website
 
 on:
   push:
-    branches:
-      - master  
+    branches: master
+
+env:
+  AWS_REGION: eu-central-1
 
 jobs:
-  deploy: 
-    runs-on: ubuntu-latest  
-
+  deploy:
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -16,25 +17,13 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.ACCESS }}
+          aws-access-key-id: ${{ secrets.ACCESS}}
           aws-secret-access-key: ${{ secrets.SECRET }}
-          aws-region: eu-central-1
-
-      - name: Install AWS CLI
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y python3-pip
-          sudo pip3 install awscli
+          aws-region: ${{ env.AWS_REGION }}
 
       - name: Deploy CloudFormation stack
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.ACCESS }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.SECRET }}
-          AWS_REGION: eu-central-1
-          STACK_NAME: "kurchland"
         run: |
-          aws cloudformation create-stack \
-          --stack-name $STACK_NAME \
-          --template-body file://${{ github.workspace }}/deploy.yml \
-          --capabilities CAPABILITY_NAMED_IAM \
-          --debug
+          aws cloudformation deploy \
+          --stack-name cloudfront \
+          --template-file deploy.yml \
+          --capabilities CAPABILITY_NAMED_IAM
