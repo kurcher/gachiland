@@ -9,7 +9,7 @@ Resources:
           - ServerSideEncryptionByDefault: 
               SSEAlgorithm: AES256
       Tags:
-        - Key: Name
+        - Key: Ars
           Value: MyS3Bucket
     DeletionPolicy: Retain
 
@@ -95,4 +95,9 @@ Resources:
                   - "s3:GetObject"
                 Resource: !Join ['', ['arn:aws:s3:::', !Ref S3Bucket, '/*']]
       Tags:
-        - Key: "Name"
+        - Key: "Ars2"
+
+Parameters:
+  CloudFrontPublicKey:
+    Type: String
+    Description: CloudFront public key ID
