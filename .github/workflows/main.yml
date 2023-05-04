@@ -24,7 +24,7 @@ jobs:
       - name: Deploy CloudFormation stack
         run: |
           aws cloudformation deploy \
-          --stack-name kurchland \
+          --stack-name deploy \
           --template-file deploy.yml \
 
           --no-fail-on-empty-changeset
