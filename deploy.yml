@@ -1,5 +1,5 @@
 Resources:
-  MyBucket:
+  Kurchucket:
     Type: 'AWS::S3::Bucket'
     Properties:
       AccessControl: PublicRead
@@ -7,14 +7,14 @@ Resources:
   MyBucketPolicy:
     Type: 'AWS::S3::BucketPolicy'
     Properties:
-      Bucket: !Ref MyBucket
+      Bucket: !Ref Kurchucket
       PolicyDocument:
         Statement:
         - Sid: PublicReadGetObject
           Effect: Allow
           Principal: '*'
           Action: 's3:GetObject'
-          Resource: !Join ['', ['arn:aws:s3:::', !Ref MyBucket, '/*']]
+          Resource: !Join ['', ['arn:aws:s3:::', !Ref Kurchucket, '/*']]
 
   MyObject:
     Type: 'AWS::S3::Bucket'
