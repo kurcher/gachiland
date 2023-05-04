@@ -1,6 +1,6 @@
 name: Deploy website
 
-on:
+on: 
   push:
     branches: master
 
