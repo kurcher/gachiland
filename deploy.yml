@@ -19,7 +19,7 @@ Resources:
   MyObject:
     Type: 'AWS::S3::Bucket'
     Properties:
-      Bucket: !Ref MyBucket
+      Bucket: !Ref Kurchucket
       Key: index.html
       Source:
         Url: https://raw.githubusercontent.com/kurch1k/gachiland/master/.github/workflows/index.html
@@ -29,7 +29,7 @@ Resources:
     Properties:
       DistributionConfig:
         Origins:
-        - DomainName: !GetAtt MyBucket.RegionalDomainName
+        - DomainName: !GetAtt Kurchucket.RegionalDomainName
           Id: MyOrigin
           S3OriginConfig:
             OriginAccessIdentity: ''
