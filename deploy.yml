@@ -1,52 +1,30 @@
 Resources:
-  Kurchucket:
+  S3Bucket:
     Type: 'AWS::S3::Bucket'
     Properties:
-      AccessControl: PublicRead
+      BucketName: kurchucket
 
-  MyBucketPolicy:
-    Type: 'AWS::S3::BucketPolicy'
+  CloudFrontOriginAccessIdentity:
+    Type: AWS::CloudFront::CloudFrontOriginAccessIdentity
     Properties:
-      Bucket: !Ref Kurchucket
-      PolicyDocument:
-        Statement:
-        - Sid: PublicReadGetObject
-          Effect: Allow
-          Principal: '*'
-          Action: 's3:GetObject'
-          Resource: !Join ['', ['arn:aws:s3:::', !Ref Kurchucket, '/*']]
+      CloudFrontOriginAccessIdentityConfig:
+        Comment: 'My CloudFront'
 
-  MyObject:
-    Type: 'AWS::S3::Bucket'
-    Properties:
-      Bucket: !Ref Kurchucket
-      Key: index.html
-      Source:
-        Url: https://raw.githubusercontent.com/kurch1k/gachiland/master/.github/workflows/index.html
 
-  MyDistribution:
+
+  CloudFrontDistribution:
     Type: 'AWS::CloudFront::Distribution'
     Properties:
       DistributionConfig:
         Origins:
-        - DomainName: !GetAtt Kurchucket.RegionalDomainName
-          Id: MyOrigin
-          S3OriginConfig:
-            OriginAccessIdentity: ''
+          - DomainName: !GetAtt S3Bucket.RegionalDomainName
+            Id: MyS3Origin
+            S3OriginConfig:
+              OriginAccessIdentity: !Sub "origin-access-identity/cloudfront/${CloudFrontOriginAccessIdentity}"
         Enabled: true
-        DefaultRootObject: index.html
         DefaultCacheBehavior:
-          AllowedMethods:
-          - GET
-          - HEAD
-          CachedMethods:
-          - GET
-          - HEAD
-          Compress: true
-          DefaultTTL: 86400
+          TargetOriginId: MyS3Origin
           ForwardedValues:
-            Cookies:
-              Forward: none
             QueryString: false
-          TargetOriginId: MyOrigin
-        ViewerProtocolPolicy: redirect-to-https
+          ViewerProtocolPolicy: redirect-to-https
+        DefaultRootObject: index.html
