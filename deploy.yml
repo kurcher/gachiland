@@ -27,4 +27,4 @@ Resources:
           ForwardedValues:
             QueryString: false
           ViewerProtocolPolicy: redirect-to-https
-        DefaultRootObject: index.html
+        DefaultRootObject: index.html 
