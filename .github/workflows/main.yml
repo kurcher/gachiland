@@ -1,9 +1,9 @@
 name: Deploy website
- 
+
 on:
   push:
     branches:
-     - master 
+      - master
 
 jobs:
   deploy:
@@ -28,10 +28,24 @@ jobs:
       - name: Deploy CloudFormation stack
         run: |
           aws cloudformation deploy \
-          --stack-name kurch1k \
-          --template-file deploy.yml \
-          --capabilities CAPABILITY_NAMED_IAM
+            --stack-name kurch1k \
+            --template-file deploy.yml \
+            --capabilities CAPABILITY_NAMED_IAM
+
+      - name: Get CloudFront distribution ID
+        id: cloudfront
+        run: |
+          distribution_id=$(aws cloudformation describe-stacks --stack-name kurch1k --query "Stacks[0].Outputs[?OutputKey=='CloudFrontDistributionId'].OutputValue" --output text)
+          echo "::set-output name=distribution_id::$distribution_id"
 
       - name: Copy index.html to S3 bucket
         run: |
           aws s3 cp index.html s3://kurchucket
+
+      - name: Invalidate CloudFront cache
+        run: |
+          distribution_id=${{ steps.cloudfront.outputs.distribution_id }}
+          aws cloudfront create-invalidation \
+            --distribution-id $distribution_id \
+            --paths "/*"
+
