@@ -32,20 +32,26 @@ jobs:
             --template-file deploy.yml \
             --capabilities CAPABILITY_NAMED_IAM
 
-      - name: Get CloudFront distribution ID
-        id: cloudfront
-        run: |
-          distribution_id=$(aws cloudformation describe-stacks --stack-name kurch1k --query "Stacks[0].Outputs[?OutputKey=='CloudFrontDistributionId'].OutputValue" --output text)
-          echo "::set-output name=distribution_id::$distribution_id"
-
+    
       - name: Copy index.html to S3 bucket
         run: |
           aws s3 cp index.html s3://kurchucket
-
-      - name: Invalidate CloudFront cache
+      - name: Get CloudFront Distribution Id
+        id: cloudfront_distribution
         run: |
-          distribution_id=${{ steps.cloudfront.outputs.distribution_id }}
+          CF_ID=$(aws cloudfront list-distributions --query 'DistributionList.Items[0].Id' --output text)
+          echo "::set-output name=id::$CF_ID"
+
+      - name: Wait for cache to be created
+        run: sleep 60
+      - name: Invalidate CloudFront cache
+        env:
+          DISTRIBUTION_ID: ""
+        run: |
+          DISTRIBUTION_ID=$(aws cloudfront list-distributions --query 'DistributionList.Items[0].Id' --output text)
+          echo "DISTRIBUTION_ID=$DISTRIBUTION_ID" >> $GITHUB_ENV
           aws cloudfront create-invalidation \
-            --distribution-id $distribution_id \
+            --distribution-id "$DISTRIBUTION_ID" \
             --paths "/*"
 
+ 
