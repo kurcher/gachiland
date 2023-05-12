@@ -18,6 +18,6 @@ jobs:
           stack-name: ecs-instances
           template: ecs-instances.yaml
           capabilities: CAPABILITY_IAM
-          region: your-aws-region
+          region: eu-central-1
           accessKeyId: ${{ secrets.ACCESS}}
           secretAccessKey: ${{ secrets.SECRET }}
