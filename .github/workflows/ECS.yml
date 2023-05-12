@@ -16,7 +16,7 @@ jobs:
         uses: aws-actions/aws-cloudformation-deploy@v1
         with:
           stack-name: ecs-instances
-          template: ecs-instances.yaml
+          template: ecs-instances.yml
           capabilities: CAPABILITY_IAM
           region: eu-central-1
           accessKeyId: ${{ secrets.ACCESS}}
