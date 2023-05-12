@@ -1,0 +1,23 @@
+name: Deploy ECS Instances
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Deploy CloudFormation stack
+        uses: aws-actions/aws-cloudformation-deploy@v1
+        with:
+          stack-name: ecs-instances
+          template: ecs-instances.yaml
+          capabilities: CAPABILITY_IAM
+          region: your-aws-region
+          accessKeyId: ${{ secrets.ACCESS}}
+          secretAccessKey: ${{ secrets.SECRET }}
