@@ -15,7 +15,7 @@ jobs:
       - name: Deploy CloudFormation stack
         uses: aws-actions/aws-cloudformation-deploy@v1
         with:
-          stack-name: ecs-services
+          stack-name: ecs-services2
           template: ecs-services.yaml
           capabilities: CAPABILITY_IAM
           region: eu-central-1
