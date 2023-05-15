@@ -30,7 +30,7 @@ jobs:
       - name: Deploy ECS Services
         run: |
           aws cloudformation deploy \
-            --template-file ecs-services.yml \
-            --stack-name ecs-services-stack \
+            --template-file services.yml \
+            --stack-name services-stack \
             --capabilities CAPABILITY_NAMED_IAM \
             --parameter-overrides ECSClusterName=MyECSCluster
