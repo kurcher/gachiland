@@ -33,4 +33,4 @@ jobs:
             --template-file services.yml \
             --stack-name services-stack \
             --capabilities CAPABILITY_NAMED_IAM \
-            --parameter-overrides ECSClusterName=MyECSCluster
+            --parameter-overrides ECSClusterName=kurchuster
