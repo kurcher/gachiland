@@ -1,0 +1,40 @@
+Parameters:
+  ECSClusterName:
+    Type: String
+    Default: kurchuster
+
+Resources:
+  LandingService1:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: !Ref ECSClusterName
+      DesiredCount: 1
+      TaskDefinition: !Ref LandingTaskDefinition1
+      LaunchType: EC2
+      PlacementStrategies:
+        - Type: spread
+          Field: instanceId
+
+  LandingService2:
+    Type: AWS::ECS::Service
+    Properties:
+      Cluster: !Ref ECSClusterName
+      DesiredCount: 1
+      TaskDefinition: !Ref LandingTaskDefinition2
+      LaunchType: EC2
+      PlacementStrategies:
+        - Type: spread
+          Field: instanceId
+
+Outputs:
+  LandingServiceURL1:
+    Description: URL of Landing Service 1
+    Value: !Sub "http://${ECSClusterName}-${AWS::Region}.amazonaws.com"
+    Export:
+      Name: LandingServiceURL1
+
+  LandingServiceURL2:
+    Description: URL of Landing Service 2
+    Value: !Sub "http://${ECSClusterName}-${AWS::Region}.amazonaws.com"
+    Export:
+      Name: LandingServiceURL2
