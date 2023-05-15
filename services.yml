@@ -10,24 +10,40 @@ Resources:
     Type: AWS::ECS::TaskDefinition
     Properties:
       Family: LandingTask1
-   
+      ContainerDefinitions:
+        - Name: landing-container1
+          Image: "nginx"
+          PortMappings:
+            - ContainerPort: 80
+          Environment:
+            - Name: kurch
+              Value: variable_value
+        
 
   LandingTaskDefinition2:
     Type: AWS::ECS::TaskDefinition
     Properties:
       Family: LandingTask2
-   
+      ContainerDefinitions:
+        - Name: landing-container2
+          Image: "nginx"
+          PortMappings:
+            - ContainerPort: 80
+          Environment:
+            - Name: kurch2
+              Value: variable_value
+         
 
   LandingService1:
     Type: AWS::ECS::Service
     Properties:
       Cluster: !Ref ECSClusterName
       TaskDefinition: !Ref LandingTaskDefinition1
-
+      # Add other necessary properties for service 1
 
   LandingService2:
     Type: AWS::ECS::Service
     Properties:
       Cluster: !Ref ECSClusterName
       TaskDefinition: !Ref LandingTaskDefinition2
-
+      # Add other necessary properties for service 2
