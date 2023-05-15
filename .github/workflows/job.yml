@@ -18,13 +18,13 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.ACCESS }}
           aws-secret-access-key: ${{ secrets.SECRET }}
-          aws-region: us-east-1
+          aws-region: eu-central-1
 
       - name: Deploy ECS Instances
         run: |
           aws cloudformation deploy \
-            --template-file ecs-instances.yaml \
-            --stack-name ecs-instances-stack \
+            --template-file instances.yaml \
+            --stack-name instances-stack \
             --capabilities CAPABILITY_NAMED_IAM
 
       - name: Deploy ECS Services
