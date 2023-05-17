@@ -18,7 +18,7 @@ Resources:
           Environment:
             - Name: kurch
               Value: variable_value
-          Memory: 512 # Додайте параметр memory або memoryReservation для контейнера
+          Memory: 512 
 
   LandingTaskDefinition2:
     Type: AWS::ECS::TaskDefinition
@@ -32,18 +32,18 @@ Resources:
           Environment:
             - Name: kurch2
               Value: variable_value
-          Memory: 512 # Додайте параметр memory або memoryReservation для контейнера
+          Memory: 512 
 
   LandingService1:
     Type: AWS::ECS::Service
     Properties:
       Cluster: !Ref ECSClusterName
       TaskDefinition: !Ref LandingTaskDefinition1
-      # Add other necessary properties for service 1
+      
 
   LandingService2:
     Type: AWS::ECS::Service
     Properties:
       Cluster: !Ref ECSClusterName
       TaskDefinition: !Ref LandingTaskDefinition2
-      # Add other necessary properties for service 2
+     
