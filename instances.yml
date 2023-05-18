@@ -1,7 +1,4 @@
-Parameters:
-  ECSClusterName: kurchuster
-    Type: String
-    Description: kurchuster
+
 
 Resources:
   EC2Instance1:
