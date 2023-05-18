@@ -1,50 +1,49 @@
 Resources:
   Cluster:
-    Type: "AWS::ECS::Cluster"
+    Type: AWS::ECS::Cluster
 
   TaskDefinition1:
-    Type: "AWS::ECS::TaskDefinition"
+    Type: AWS::ECS::TaskDefinition
     Properties:
       ContainerDefinitions:
-        - Name: "web" 
-          Image: "nginx"
+        - Name: web
+          Image: nginx
           PortMappings:
             - ContainerPort: 80
           Memory: 512
           Cpu: 256
-      Family: "justfamily1"
-      NetworkMode: "bridge"
+      Family: justfamily1
+      NetworkMode: bridge
       RequiresCompatibilities:
-        - "EC2"
+        - EC2
 
   TaskDefinition2:
-    Type: "AWS::ECS::TaskDefinition"
+    Type: AWS::ECS::TaskDefinition
     Properties:
       ContainerDefinitions:
-        - Name: "simple-task"
-          Image: "hello-world"
+        - Name: simple-task
+          Image: hello-world
           Memory: 512
           Cpu: 256
-      Family: "justfamily2"
-      NetworkMode: "bridge"
+      Family: justfamily2
+      NetworkMode: bridge
       RequiresCompatibilities:
-        - "EC2"
+        - EC2
 
   Service1:
-    Type: "AWS::ECS::Service"
+    Type: AWS::ECS::Service
     Properties:
       Cluster: !Ref Cluster
       DesiredCount: 1
       TaskDefinition: !Ref TaskDefinition1
-      LaunchType: "EC2"
-      SchedulingStrategy: "REPLICA"
+      LaunchType: EC2
+      SchedulingStrategy: REPLICA
 
   Service2:
-    Type: "AWS::ECS::Service"
+    Type: AWS::ECS::Service
     Properties:
       Cluster: !Ref Cluster
       DesiredCount: 1
       TaskDefinition: !Ref TaskDefinition2
-      LaunchType: "EC2"
-      SchedulingStrategy: "REPLICA"
-     
+      LaunchType: EC2
+      SchedulingStrategy: REPLICA
