@@ -6,7 +6,7 @@ Resources:
     Type: "AWS::ECS::TaskDefinition"
     Properties:
       ContainerDefinitions:
-        - Name: "web"
+        - Name: "web" 
           Image: "nginx"
           PortMappings:
             - ContainerPort: 80
