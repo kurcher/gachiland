@@ -1,31 +1,31 @@
 Parameters:
-  ECSClusterName:
-    Type: String
-    Description: kurchuster
+ECSClusterName:
+Type: String
+Description: Name of the ECS cluster
 
 Resources:
-  EC2Instance1:
-    Type: AWS::EC2::Instance
-    Properties:
-      InstanceType: t2.micro
-      ImageId: ami-03aefa83246f44ef2
-      Tags:
-        - Key: Name
-          Value: Instance1
-      UserData:
-        Fn::Base64: !Sub |
-          #!/bin/bash
-          echo ECS_CLUSTER=${ECSClusterName} >> /etc/ecs/ecs.config
+EC2Instance1:
+Type: AWS::EC2::Instance
+Properties:
+InstanceType: t2.micro
+ImageId: ami-03aefa83246f44ef2
+Tags:
+- Key: Name
+Value: Instance1
+UserData:
+Fn::Base64: !Sub |
+#!/bin/bash
+echo "ECS_CLUSTER=${ECSClusterName}" >> /etc/ecs/ecs.config
 
-  EC2Instance2:
-    Type: AWS::EC2::Instance
-    Properties:
-      InstanceType: t2.micro
-      ImageId: ami-03aefa83246f44ef2
-      Tags:
-        - Key: Name
-          Value: Instance2
-      UserData:
-        Fn::Base64: !Sub |
-          #!/bin/bash
-          echo ECS_CLUSTER=${ECSClusterName} >> /etc/ecs/ecs.config
+EC2Instance2:
+Type: AWS::EC2::Instance
+Properties:
+InstanceType: t2.micro
+ImageId: ami-03aefa83246f44ef2
+Tags:
+- Key: Name
+Value: Instance2
+UserData:
+Fn::Base64: !Sub |
+#!/bin/bash
+echo "ECS_CLUSTER=${ECSClusterName}" >> /etc/ecs/ecs.config
