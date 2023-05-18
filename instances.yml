@@ -1,7 +1,7 @@
 Parameters:
   ECSClusterName:
     Type: String
-    Description: Name of the ECS cluster
+    Description: kurchuster
 
 Resources:
   EC2Instance1:
