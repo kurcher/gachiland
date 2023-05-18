@@ -1,5 +1,5 @@
 Parameters:
-  ECSClusterName:
+  ECSClusterName: kurchuster
     Type: String
     Description: kurchuster
 
