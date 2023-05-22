@@ -1,4 +1,7 @@
-
+Parameters:
+  ECSClusterName: kurchuster
+    Type: String
+    Default: myECSCluster
 
 Resources:
   EC2Instance1:
