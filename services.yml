@@ -30,7 +30,7 @@ Resources:
       RequiresCompatibilities:
         - EC2
 
-   Service1:
+  Service1:
     Type: AWS::ECS::Service
     Properties:
       Cluster: !Ref Cluster
