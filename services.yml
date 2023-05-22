@@ -30,7 +30,7 @@ Resources:
       RequiresCompatibilities:
         - EC2
 
-  Service1:
+   Service1:
     Type: AWS::ECS::Service
     Properties:
       Cluster: !Ref Cluster
@@ -38,6 +38,10 @@ Resources:
       TaskDefinition: !Ref TaskDefinition1
       LaunchType: EC2
       SchedulingStrategy: REPLICA
+      PlacementStrategies:
+        - Type: spread
+          Field: "tag:ECSPlacement"
+          Expression: "enabled"
 
   Service2:
     Type: AWS::ECS::Service
@@ -47,3 +51,7 @@ Resources:
       TaskDefinition: !Ref TaskDefinition2
       LaunchType: EC2
       SchedulingStrategy: REPLICA
+      PlacementStrategies:
+        - Type: spread
+          Field: "tag:ECSPlacement"
+          Expression: "enabled"
