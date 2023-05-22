@@ -6,7 +6,7 @@ Resources:
     Properties:
       InstanceType: t2.micro
       ImageId: ami-03aefa83246f44ef2
-      Tags:
+      Tags: 
         - Key: Name
           Value: Instance1
       UserData:
