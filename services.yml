@@ -2,7 +2,7 @@ Resources:
   Cluster:
     Type: AWS::ECS::Cluster
 
-  TaskDefinition1:
+  TaskDefinition1: 
     Type: AWS::ECS::TaskDefinition
     Properties:
       ContainerDefinitions:
