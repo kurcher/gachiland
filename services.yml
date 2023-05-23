@@ -39,7 +39,7 @@ Resources:
       LaunchType: EC2
       SchedulingStrategy: REPLICA
       PlacementStrategies:
-        - Type: spread
+        - Type: random
 
   Service2:
     Type: AWS::ECS::Service
@@ -50,4 +50,4 @@ Resources:
       LaunchType: EC2
       SchedulingStrategy: REPLICA
       PlacementStrategies:
-        - Type: spread
+        - Type: random
