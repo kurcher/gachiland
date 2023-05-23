@@ -17,19 +17,6 @@ Resources:
       RequiresCompatibilities:
         - EC2
 
-  TaskDefinition2:
-    Type: AWS::ECS::TaskDefinition
-    Properties:
-      ContainerDefinitions:
-        - Name: simple-task
-          Image: hello-world
-          Memory: 512
-          Cpu: 256
-      Family: justfamily2
-      NetworkMode: bridge
-      RequiresCompatibilities:
-        - EC2
-
   Service1:
     Type: AWS::ECS::Service
     Properties:
@@ -40,7 +27,6 @@ Resources:
       SchedulingStrategy: REPLICA
       PlacementStrategies:
         - Type: random
-
   Service2:
     Type: AWS::ECS::Service
     Properties:
@@ -51,3 +37,8 @@ Resources:
       SchedulingStrategy: REPLICA
       PlacementStrategies:
         - Type: random
+
+
+Outputs:
+  ClusterName:
+    Value: !Ref Cluster
