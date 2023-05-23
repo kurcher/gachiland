@@ -1,8 +1,7 @@
-Resources:
-  Cluster:
+Cluster:
     Type: AWS::ECS::Cluster
 
-  TaskDefinition1: 
+  TaskDefinition1:
     Type: AWS::ECS::TaskDefinition
     Properties:
       ContainerDefinitions:
@@ -17,7 +16,7 @@ Resources:
       RequiresCompatibilities:
         - EC2
 
-  TaskDefinition2: 
+  TaskDefinition2:
     Type: AWS::ECS::TaskDefinition
     Properties:
       ContainerDefinitions:
@@ -55,3 +54,4 @@ Resources:
 Outputs:
   ClusterName:
     Value: !Ref Cluster
+
