@@ -41,7 +41,6 @@ Resources:
       PlacementStrategies:
         - Type: spread
           Field: "tag:ECSPlacement"
-          Expression: "enabled"
 
   Service2:
     Type: AWS::ECS::Service
@@ -54,4 +53,3 @@ Resources:
       PlacementStrategies:
         - Type: spread
           Field: "tag:ECSPlacement"
-          Expression: "enabled"
