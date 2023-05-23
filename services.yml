@@ -1,4 +1,5 @@
-Cluster:
+Resources:
+  Cluster:
     Type: AWS::ECS::Cluster
 
   TaskDefinition1:
@@ -54,4 +55,3 @@ Cluster:
 Outputs:
   ClusterName:
     Value: !Ref Cluster
-
