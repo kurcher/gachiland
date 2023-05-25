@@ -1,3 +1,8 @@
+Parameters:
+  ECSClusterName:
+    Type: String
+    Default: kurchuster
+
 Resources:
   Cluster:
     Type: AWS::ECS::Cluster
