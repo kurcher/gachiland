@@ -40,6 +40,9 @@ Resources:
       SchedulingStrategy: REPLICA
       PlacementStrategies:
         - Type: random
+      LoadBalancers:
+        - ContainerName: web
+          ContainerPort: 80
 
   Service2:
     Type: AWS::ECS::Service
@@ -49,8 +52,6 @@ Resources:
       TaskDefinition: !Ref TaskDefinition2
       LaunchType: EC2
       SchedulingStrategy: REPLICA
-      PlacementStrategies:
-        - Type: random
 
 Outputs:
   ClusterName:
