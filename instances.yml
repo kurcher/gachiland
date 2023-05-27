@@ -36,6 +36,4 @@ Resources:
 
 Outputs:
   EC2InstanceIds:
-    Value:
-      - !Ref EC2Instance1
-      - !Ref EC2Instance2
+    Value: !Join [",", [!Ref EC2Instance1, !Ref EC2Instance2]]
