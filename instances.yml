@@ -33,3 +33,9 @@ Resources:
         Fn::Base64: !Sub |
           #!/bin/bash
           echo "ECS_CLUSTER=${ECSClusterName}" >> /etc/ecs/ecs.config
+
+Outputs:
+  EC2InstanceIds:
+    Value:
+      - !Ref EC2Instance1
+      - !Ref EC2Instance2
