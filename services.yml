@@ -58,3 +58,4 @@ Resources:
 Outputs:
   ClusterName:
     Value: !Ref Cluster
+
