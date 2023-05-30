@@ -52,3 +52,18 @@ Resources:
             Principal:
               Service: ec2.amazonaws.com
             Action: sts:Ass
+  EC2InstanceRole:
+    Version: '2012-10-17'
+    Statement:
+    - Effect: Allow
+    Principal:
+      Service: ec2.amazonaws.com
+      Action: sts:AssumeRole
+      ManagedPolicyArns:
+            - arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role
+
+    Outputs:
+    EC2Instance1Id:
+    Value: !Ref EC2Instance1
+    EC2Instance2Id:
+    Value: !Ref EC2Instance2
