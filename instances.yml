@@ -9,7 +9,7 @@ Resources:
     Properties:
       InstanceType: t2.micro
       ImageId: ami-03aefa83246f44ef2
-      IamInstanceProfile: !Ref EC2InstanceProfile
+      IamInstanceProfile: !Ref EC2InstanceProfile 
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
