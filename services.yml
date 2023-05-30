@@ -4,12 +4,16 @@ Parameters:
     Default: kurchuster
 
 Resources:
-  Cluster:
+  ECSCluster:
     Type: AWS::ECS::Cluster
 
   TaskDefinition1:
     Type: AWS::ECS::TaskDefinition
     Properties:
+      Family: justfamily1
+      NetworkMode: bridge
+      RequiresCompatibilities:
+        - EC2
       ContainerDefinitions:
         - Name: web
           Image: nginx
@@ -17,28 +21,24 @@ Resources:
             - ContainerPort: 80
           Memory: 512
           Cpu: 256
-      Family: justfamily1
-      NetworkMode: bridge
-      RequiresCompatibilities:
-        - EC2
 
   TaskDefinition2:
     Type: AWS::ECS::TaskDefinition
     Properties:
+      Family: justfamily2
+      NetworkMode: bridge
+      RequiresCompatibilities:
+        - EC2
       ContainerDefinitions:
         - Name: simple-task
           Image: hello-world
           Memory: 512
           Cpu: 256
-      Family: justfamily2
-      NetworkMode: bridge
-      RequiresCompatibilities:
-        - EC2
 
   Service1:
     Type: AWS::ECS::Service
     Properties:
-      Cluster: !Ref Cluster
+      Cluster: !Ref ECSCluster
       DesiredCount: 1
       TaskDefinition: !Ref TaskDefinition1
       LaunchType: EC2
@@ -49,7 +49,7 @@ Resources:
   Service2:
     Type: AWS::ECS::Service
     Properties:
-      Cluster: !Ref Cluster
+      Cluster: !Ref ECSCluster
       DesiredCount: 1
       TaskDefinition: !Ref TaskDefinition2
       LaunchType: EC2
@@ -57,5 +57,5 @@ Resources:
 
 Outputs:
   ClusterName:
-    Value: !Ref Cluster
+    Value: !Ref ECSCluster
 
