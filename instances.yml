@@ -9,27 +9,46 @@ Resources:
     Properties:
       InstanceType: t2.micro
       ImageId: ami-03aefa83246f44ef2
+      IamInstanceProfile: !Ref EC2InstanceProfile
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          echo "ECS_CLUSTER=${ECSClusterName}" >> /etc/ecs/ecs.config
       Tags:
         - Key: Name
           Value: Instance1
         - Key: ECSPlacement
           Value: enabled
-      UserData:
-        Fn::Base64: !Sub |
-          #!/bin/bash
-          echo "ECS_CLUSTER=${ECSClusterName}" >> /etc/ecs/ecs.config
 
   EC2Instance2:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: t2.micro
       ImageId: ami-03aefa83246f44ef2
+      IamInstanceProfile: !Ref EC2InstanceProfile
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          echo "ECS_CLUSTER=${ECSClusterName}" >> /etc/ecs/ecs.config
       Tags:
         - Key: Name
           Value: Instance2
         - Key: ECSPlacement
           Value: enabled
-      UserData:
-        Fn::Base64: !Sub |
-          #!/bin/bash
-          echo "ECS_CLUSTER=${ECSClusterName}" >> /etc/ecs/ecs.config
+
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref EC2InstanceRole
+
+  EC2InstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:Ass
