@@ -42,3 +42,6 @@ jobs:
           instance_arn2=$(aws ecs describe-container-instances --cluster DeepLearnProject --filter "name=ec2InstanceId,values=${instance_id2}" --query 'containerInstances[0].containerInstanceArn' --output text)
           aws ecs register-container-instance --cluster DeepLearnProject --container-instance-arn $instance_arn1
           aws ecs register-container-instance --cluster DeepLearnProject --container-instance-arn $instance_arn2
+      - name: Fetch stack events
+        run: |
+          aws cloudformation describe-stack-events --stack-name <your-stack-name>
