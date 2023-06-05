@@ -13,7 +13,7 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
-          /bin/bash
+          echo "#!/bin/bash" >> /etc/ecs/ecs.config
           echo "ECS_CLUSTER=${ECSClusterName}" >> /etc/ecs/ecs.config
       Tags:
         - Key: Name
@@ -30,7 +30,7 @@ Resources:
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
-          /bin/bash
+          echo "#!/bin/bash" >> /etc/ecs/ecs.config
           echo "ECS_CLUSTER=${ECSClusterName}" >> /etc/ecs/ecs.config
       Tags:
         - Key: Name
@@ -70,4 +70,4 @@ Outputs:
   EC2Instance1Id:
     Value: !Ref EC2Instance1
   EC2Instance2Id:
-    Value: !Ref EC2Instance2
+    Value: !Ref EC2Instance2 
