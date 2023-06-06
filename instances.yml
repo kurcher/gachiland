@@ -1,73 +1,56 @@
-Parameters:
-  ECSClusterName:
-    Type: String
-    Default: kurchuster
+AWSTemplateFormatVersion: '2010-09-09'
 
 Resources:
-  EC2Instance1:
-    Type: AWS::EC2::Instance 
+  Cluster:
+    Type: 'AWS::ECS::Cluster'
     Properties:
-      InstanceType: t2.micro
+      ClusterName: kurchuster
+
+  SecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Allow SSH access
+      SecurityGroupIngress:
+        
+IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 0.0.0.0/0
+    VpcId: your-vpc-id
+
+  EC2Instance1:
+    Type: 'AWS::EC2::Instance'
+    Properties:
       ImageId: ami-07151644aeb34558a
-      IamInstanceProfile: !Ref EC2InstanceProfile 
-      UserData:
-        Fn::Base64: !Sub |
-          #!/bin/bash
-          echo "#!/bin/bash" >> /etc/ecs/ecs.config
-          echo "ECS_CLUSTER=${ECSClusterName}" >> /etc/ecs/ecs.config
-      Tags:
-        - Key: Name
-          Value: Instance1
-        - Key: ECSPlacement
-          Value: enabled
+      InstanceType: t2.micro
+      SecurityGroupIds:
+        
+!Ref SecurityGroup
+    UserData:Fn::Base64: !Sub |#!/bin/bash
+        apt-get update
+        apt-get install -y software-package# Реєстрація інстансу до кластеру ECS
+        echo ECS_CLUSTER=${Cluster} >> /etc/ecs/ecs.config
 
   EC2Instance2:
-    Type: AWS::EC2::Instance
+    Type: 'AWS::EC2::Instance'
     Properties:
-      InstanceType: t2.micro
       ImageId: ami-07151644aeb34558a
-      IamInstanceProfile: !Ref EC2InstanceProfile
-      UserData:
-        Fn::Base64: !Sub |
-          #!/bin/bash
-          echo "#!/bin/bash" >> /etc/ecs/ecs.config
-          echo "ECS_CLUSTER=${ECSClusterName}" >> /etc/ecs/ecs.config
-      Tags:
-        - Key: Name
-          Value: Instance2
-        - Key: ECSPlacement
-          Value: enabled
-
-  EC2InstanceProfile:
-    Type: AWS::IAM::InstanceProfile
-    Properties:
-      Roles:
-        - !Ref EC2InstanceRole
-
-  EC2InstanceRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: ec2.amazonaws.com
-            Action: sts:AssumeRole
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role
-
-  RegisterContainerInstances:
-    Type: AWS::CloudFormation::CustomResource
-    Properties:
-      ServiceToken: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:RegisterEC2Instances
-      ClusterName: !Ref ECSClusterName
-      InstanceIds:
-        - !Ref EC2Instance1
-        - !Ref EC2Instance2
+      InstanceType: t2.micro
+      SecurityGroupIds:
+        
+!Ref SecurityGroup
+    UserData:Fn::Base64: !Sub |#!/bin/bash
+        apt-get update
+        apt-get install -y software-package# Реєстрація інстансу до кластеру ECS
+        echo ECS_CLUSTER=${Cluster} >> /etc/ecs/ecs.config
 
 Outputs:
-  EC2Instance1Id:
+  EC2Instance1:
     Value: !Ref EC2Instance1
-  EC2Instance2Id:
-    Value: !Ref EC2Instance2 
+    Export:
+      Name: EC2Instance1
+
+  EC2Instance2:
+    Value: !Ref EC2Instance2
+    Export:
+      Name: EC2Instance2
