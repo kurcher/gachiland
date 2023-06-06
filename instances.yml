@@ -16,11 +16,10 @@ Resources:
           echo "#!/bin/bash" >> /etc/ecs/ecs.config
           echo "ECS_CLUSTER=${ECSClusterName}" >> /etc/ecs/ecs.config
       Tags:
-        
-Key: Name
-        Value: Instance1
-Key: ECSPlacement
-      Value: enabled
+        - Key: Name
+          Value: Instance1
+        - Key: ECSPlacement
+          Value: enabled
 
   EC2Instance2:
     Type: AWS::EC2::Instance
@@ -34,18 +33,16 @@ Key: ECSPlacement
           echo "#!/bin/bash" >> /etc/ecs/ecs.config
           echo "ECS_CLUSTER=${ECSClusterName}" >> /etc/ecs/ecs.config
       Tags:
-        
-Key: Name
-        Value: Instance2
-Key: ECSPlacement
-      Value: enabled
+        - Key: Name
+          Value: Instance2
+        - Key: ECSPlacement
+          Value: enabled
 
   EC2InstanceProfile:
     Type: AWS::IAM::InstanceProfile
     Properties:
       Roles:
-        
-!Ref EC2InstanceRole
+        - !Ref EC2InstanceRole
 
   EC2InstanceRole:
     Type: AWS::IAM::Role
@@ -53,13 +50,12 @@ Key: ECSPlacement
       AssumeRolePolicyDocument:
         Version: '2012-10-17'
         Statement:
-          
-Effect: Allow
-          Principal:
-            Service: ec2.amazonaws.com
-          Action: sts:AssumeRole
-    ManagedPolicyArns:
-arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role
 
   RegisterContainerInstances:
     Type: AWS::CloudFormation::CustomResource
@@ -67,9 +63,8 @@ arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role
       ServiceToken: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:RegisterEC2Instances
       ClusterName: !Ref ECSClusterName
       InstanceIds:
-        
-!Ref EC2Instance1
-!Ref EC2Instance2
+        - !Ref EC2Instance1
+        - !Ref EC2Instance2
 
 Outputs:
   EC2Instance1Id:
