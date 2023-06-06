@@ -7,7 +7,7 @@ Resources:
   EC2Instance1:
     Type: AWS::EC2::Instance 
     Properties:
-      InstanceType: t2.micro
+      InstanceType: t2.micro    
       ImageId: ami-07151644aeb34558a
       IamInstanceProfile: !Ref EC2InstanceProfile 
       UserData:
