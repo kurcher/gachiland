@@ -3,32 +3,31 @@ Resources:
   EC2Instance1:
     Type: AWS::EC2::Instance
     Properties:
+      ImageId: ami-07151644aeb34558a
       InstanceType: t2.micro
-      ImageId: ami-07151644aeb34558a # Замініть на ID AMI, який ви хочете використовувати
-      # Додайте необхідні параметри для EC2 інстансу
+      # Додайте необхідні властивості для EC2-інстансу
 
   EC2Instance2:
     Type: AWS::EC2::Instance
     Properties:
+      ImageId: ami-07151644aeb34558a
       InstanceType: t2.micro
-      ImageId: ami-07151644aeb34558a # Замініть на ID AMI, який ви хочете використовувати
-      # Додайте необхідні параметри для другого EC2 інстансу
+      # Додайте необхідні властивості для другого EC2-інстансу
 
   ECSRegisterTaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
-      # Додайте необхідні параметри для Task Definition
+      # Встановіть властивості для Task Definition
+      ContainerDefinitions:
+        - Name: landing
+          # Встановіть властивості контейнера лендінгу
+          Image: nginx:latest
+          # Додайте необхідні параметри для контейнера лендінгу
 
   ECSRegisterEC2Instances:
     Type: AWS::ECS::Service
     Properties:
+      Cluster: kurchuster
       TaskDefinition: !Ref ECSRegisterTaskDefinition
       DesiredCount: 2
       LaunchType: EC2
-      NetworkConfiguration:
-        AwsvpcConfiguration:
-          Subnets:
-            - subnet-12345678   # Замініть на ID підмережі, до якої бажаєте підключити
-          SecurityGroups:
-            - sg-12345678      # Замініть на ID групи безпеки, яку бажаєте використовувати
-          AssignPublicIp: ENABLED   # Для публічного IP-адреси встановіть значення ENABLED
