@@ -1,14 +1,12 @@
-name: Deploy ECS Services
-
+name: Deploy ECS Infrastructure
 on:
-  push: 
+  push:
     branches:
-      - master   
+       -master
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest 
-
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -16,32 +14,28 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.ACCESS }}
-          aws-secret-access-key: ${{ secrets.SECRET }}
+          aws-access-key-id: ${{ secrets.ACCESSS }}
+          aws-secret-access-key: ${{ secrets.SECRETS }}
           aws-region: eu-central-1
 
-      - name: Deploy ECS Instances
+      - name: Deploy EC2 instances and ECS resources
         run: |
-          aws cloudformation deploy \
-            --template-file instances.yml \
-            --stack-name instances-stack \
-            --capabilities CAPABILITY_NAMED_IAM
+          aws cloudformation create-stack \
+            --stack-name EC2InstancesStack \
+            --template-file instances.yml 
 
-      - name: Deploy ECS Services
+      - name: Wait for EC2 instances and ECS resources to be created
         run: |
-          aws cloudformation deploy \
-            --template-file services.yml \
-            --stack-name services-stack \
-            --capabilities CAPABILITY_NAMED_IAM \
-            --parameter-overrides ECSClusterName=kurchuster
-      - name: Register EC2 Instances with ECS Cluster
+          aws cloudformation wait stack-create-complete \
+            --stack-name EC2InstancesStack
+
+      - name: Deploy ECS cluster and landing service
         run: |
-          instance_id1="${{ steps.get-instance-ids.outputs.instance_id_1 }}"
-          instance_id2="${{ steps.get-instance-ids.outputs.instance_id_2 }}"
-          instance_arn1=$(aws ecs describe-container-instances --cluster DeepLearnProject --filter "name=ec2InstanceId,values=${instance_id1}" --query 'containerInstances[0].containerInstanceArn' --output text)
-          instance_arn2=$(aws ecs describe-container-instances --cluster DeepLearnProject --filter "name=ec2InstanceId,values=${instance_id2}" --query 'containerInstances[0].containerInstanceArn' --output text)
-          aws ecs register-container-instance --cluster DeepLearnProject --container-instance-arn $instance_arn1
-          aws ecs register-container-instance --cluster DeepLearnProject --container-instance-arn $instance_arn2
-      - name: Fetch stack events
+          aws cloudformation create-stack \
+            --stack-name ECSStack \
+            --template-file services.yml
+
+      - name: Wait for ECS cluster and landing service to be created
         run: |
-          aws cloudformation describe-stack-events --stack-name <your-stack-name>
+          aws cloudformation wait stack-create-complete \
+            --stack-name ECSStack
