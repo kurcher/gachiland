@@ -1,61 +1,26 @@
-Parameters:
-  ECSClusterName:
-    Type: String
-    Default: kurchuster
-
+AWSTemplateFormatVersion: '2010-09-09'
 Resources:
   ECSCluster:
     Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: kurchuster
+      # Додаткові властивості для ECS-кластера
 
-  TaskDefinition1:
+  ECSLandingTaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
-      Family: justfamily1
-      NetworkMode: bridge
-      RequiresCompatibilities:
-        - EC2
+      # Встановіть властивості для Task Definition лендінгу
       ContainerDefinitions:
-        - Name: web
-          Image: nginx
+        - Name: landing
+          Image: nginx:latest
           PortMappings:
             - ContainerPort: 80
-          Memory: 512
-          Cpu: 256
+          # Додайте необхідні параметри для контейнера лендінгу
 
-  TaskDefinition2:
-    Type: AWS::ECS::TaskDefinition
-    Properties:
-      Family: justfamily2
-      NetworkMode: bridge
-      RequiresCompatibilities:
-        - EC2
-      ContainerDefinitions:
-        - Name: simple-task
-          Image: hello-world
-          Memory: 512
-          Cpu: 256
-
-  Service1:
+  ECSLandingService:
     Type: AWS::ECS::Service
     Properties:
-      Cluster: !Ref ECSCluster
-      DesiredCount: 1
-      TaskDefinition: !Ref TaskDefinition1
+      Cluster: kurchuster
+      TaskDefinition: !Ref ECSLandingTaskDefinition
+      DesiredCount: 2
       LaunchType: EC2
-      SchedulingStrategy: REPLICA
-      PlacementStrategies:
-        - Type: random
-
-  Service2:
-    Type: AWS::ECS::Service
-    Properties:
-      Cluster: !Ref ECSCluster
-      DesiredCount: 1
-      TaskDefinition: !Ref TaskDefinition2
-      LaunchType: EC2
-      SchedulingStrategy: REPLICA
-
-Outputs:
-  ClusterName:
-    Value: !Ref ECSCluster
-
