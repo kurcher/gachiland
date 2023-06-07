@@ -20,9 +20,12 @@ jobs:
 
       - name: Deploy EC2 instances and ECS resources
         run: |
-          aws cloudformation create-stack \
-            --stack-name EC2InstancesStack \
-            --template-file instances.yml 
+           aws cloudformation deploy \
+           --template-file instances.yml \
+           --stack-name instances-stack \
+           --capabilities CAPABILITY_NAMED_IAM
+
+
 
       - name: Wait for EC2 instances and ECS resources to be created
         run: |
