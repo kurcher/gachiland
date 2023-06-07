@@ -1,73 +1,34 @@
-Parameters:
-  ECSClusterName:
-    Type: String
-    Default: kurchuster
-
+AWSTemplateFormatVersion: '2010-09-09'
 Resources:
   EC2Instance1:
-    Type: AWS::EC2::Instance 
+    Type: AWS::EC2::Instance
     Properties:
-      InstanceType: t2.micro    
-      ImageId: ami-07151644aeb34558a
-      IamInstanceProfile: !Ref EC2InstanceProfile 
-      UserData:
-        Fn::Base64: !Sub |
-          #!/bin/bash
-          echo "#!/bin/bash" >> /etc/ecs/ecs.config
-          echo "ECS_CLUSTER=${ECSClusterName}" >> /etc/ecs/ecs.config
-      Tags:
-        - Key: Name
-          Value: Instance1
-        - Key: ECSPlacement
-          Value: enabled
+      InstanceType: t2.micro
+      ImageId: ami-07151644aeb34558a # Замініть на ID AMI, який ви хочете використовувати
+      # Додайте необхідні параметри для EC2 інстансу
 
   EC2Instance2:
     Type: AWS::EC2::Instance
     Properties:
       InstanceType: t2.micro
-      ImageId: ami-07151644aeb34558a
-      IamInstanceProfile: !Ref EC2InstanceProfile
-      UserData:
-        Fn::Base64: !Sub |
-          #!/bin/bash
-          echo "#!/bin/bash" >> /etc/ecs/ecs.config
-          echo "ECS_CLUSTER=${ECSClusterName}" >> /etc/ecs/ecs.config
-      Tags:
-        - Key: Name
-          Value: Instance2
-        - Key: ECSPlacement
-          Value: enabled
+      ImageId: ami-07151644aeb34558a # Замініть на ID AMI, який ви хочете використовувати
+      # Додайте необхідні параметри для другого EC2 інстансу
 
-  EC2InstanceProfile:
-    Type: AWS::IAM::InstanceProfile
+  ECSRegisterTaskDefinition:
+    Type: AWS::ECS::TaskDefinition
     Properties:
-      Roles:
-        - !Ref EC2InstanceRole
+      # Додайте необхідні параметри для Task Definition
 
-  EC2InstanceRole:
-    Type: AWS::IAM::Role
+  ECSRegisterEC2Instances:
+    Type: AWS::ECS::Service
     Properties:
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          - Effect: Allow
-            Principal:
-              Service: ec2.amazonaws.com
-            Action: sts:AssumeRole
-      ManagedPolicyArns:
-        - arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role
-
-  RegisterContainerInstances:
-    Type: AWS::CloudFormation::CustomResource
-    Properties:
-      ServiceToken: !Sub arn:aws:lambda:${AWS::Region}:${AWS::AccountId}:function:RegisterEC2Instances
-      ClusterName: !Ref ECSClusterName
-      InstanceIds:
-        - !Ref EC2Instance1
-        - !Ref EC2Instance2
-
-Outputs:
-  EC2Instance1Id:
-    Value: !Ref EC2Instance1
-  EC2Instance2Id:
-    Value: !Ref EC2Instance2
+      TaskDefinition: !Ref ECSRegisterTaskDefinition
+      DesiredCount: 2
+      LaunchType: EC2
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          Subnets:
+            - subnet-12345678   # Замініть на ID підмережі, до якої бажаєте підключити
+          SecurityGroups:
+            - sg-12345678      # Замініть на ID групи безпеки, яку бажаєте використовувати
+          AssignPublicIp: ENABLED   # Для публічного IP-адреси встановіть значення ENABLED
