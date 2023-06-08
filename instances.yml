@@ -6,24 +6,23 @@ Resources:
     Properties:
       ImageId: ami-07151644aeb34558a
       InstanceType: t2.micro
-      # Add any additional necessary properties for the EC2 instance
+      # Add any additional necessary properties for EC2 instance 1
 
   EC2Instance2:
     Type: AWS::EC2::Instance
     Properties:
       ImageId: ami-07151644aeb34558a
       InstanceType: t2.micro
-      # Add any additional necessary properties for the second EC2 instance
+      # Add any additional necessary properties for EC2 instance 2
 
   ECSRegisterTaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
-      # Set properties for the Task Definition
       ContainerDefinitions:
         - Name: landing
-          # Set properties for the landing container
+          Memory: 512  # Specify the desired memory for the container
+          # Add any other necessary properties for the landing container
           Image: nginx:latest
-          # Add any necessary parameters for the landing container
 
   ECSRegisterEC2Instances:
     Type: AWS::ECS::Service
