@@ -15,7 +15,7 @@ Resources:
       InstanceType: t2.micro
       # Add any additional necessary properties for EC2 instance 2
 
-  ECSRegisterTaskDefinition:
+  ECSRegisterTaskDefinition: 
     Type: AWS::ECS::TaskDefinition
     Properties:
       ContainerDefinitions:
