@@ -4,7 +4,7 @@ Resources:
   EC2Instance1:
     Type: AWS::EC2::Instance
     Properties:
-      ImageId: ami-07151644aeb34558a
+      ImageId: ami-07151644aeb34558a 
       InstanceType: t2.micro
       # Додайте необхідні властивості для EC2-інстансу 1 
       # Наприклад, SecurityGroups, KeyName, UserData та інші налаштування
