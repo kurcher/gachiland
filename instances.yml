@@ -20,7 +20,7 @@ Resources:
   ECSRegisterTaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
-      Family: !Ref AWS::StackName
+      Family: !Ref AWS::EC2InstancesStack
       ContainerDefinitions:
         - Name: landing
           Memory: 512
