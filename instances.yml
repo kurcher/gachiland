@@ -1,28 +1,29 @@
 AWSTemplateFormatVersion: '2010-09-09'
+
 Resources:
   EC2Instance1:
     Type: AWS::EC2::Instance
     Properties:
       ImageId: ami-07151644aeb34558a
       InstanceType: t2.micro
-      # Додайте необхідні властивості для EC2-інстансу 
+      # Add any additional necessary properties for the EC2 instance
 
   EC2Instance2:
     Type: AWS::EC2::Instance
     Properties:
       ImageId: ami-07151644aeb34558a
       InstanceType: t2.micro
-      # Додайте необхідні властивості для другого EC2-інстансу
+      # Add any additional necessary properties for the second EC2 instance
 
   ECSRegisterTaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
-      # Встановіть властивості для Task Definition
+      # Set properties for the Task Definition
       ContainerDefinitions:
         - Name: landing
-          # Встановіть властивості контейнера лендінгу
+          # Set properties for the landing container
           Image: nginx:latest
-          # Додайте необхідні параметри для контейнера лендінгу
+          # Add any necessary parameters for the landing container
 
   ECSRegisterEC2Instances:
     Type: AWS::ECS::Service
