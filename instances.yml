@@ -6,23 +6,31 @@ Resources:
     Properties:
       ImageId: ami-07151644aeb34558a
       InstanceType: t2.micro
-      # Add any additional necessary properties for EC2 instance 1
+      # Додайте необхідні властивості для EC2-інстансу 1
+      # Наприклад, SecurityGroups, KeyName, UserData та інші налаштування
 
   EC2Instance2:
     Type: AWS::EC2::Instance
     Properties:
       ImageId: ami-07151644aeb34558a
       InstanceType: t2.micro
-      # Add any additional necessary properties for EC2 instance 2
+      # Додайте необхідні властивості для EC2-інстансу 2
+      # Наприклад, SecurityGroups, KeyName, UserData та інші налаштування
 
-  ECSRegisterTaskDefinition: 
+  ECSRegisterTaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
+      Family: !Ref AWS::StackName
       ContainerDefinitions:
         - Name: landing
-          Memory: 512  # Specify the desired memory for the container
-          # Add any other necessary properties for the landing container
+          Memory: 512
+          Essential: true
           Image: nginx:latest
+          PortMappings:
+            - ContainerPort: 80
+              Protocol: tcp
+          # Додайте будь-які додаткові параметри для контейнера лендінгу
+          # Наприклад, Environment, Volumes, Logging та інші налаштування
 
   ECSRegisterEC2Instances:
     Type: AWS::ECS::Service
