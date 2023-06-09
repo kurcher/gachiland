@@ -5,7 +5,7 @@ Resources:
     Type: AWS::EC2::Instance
     Properties:
       ImageId: ami-07151644aeb34558a   
-      InstanceType: t2.micro 
+      InstanceType: t2.micro
       # Додайте необхідні властивості для EC2-інстансу 1 
       # Наприклад, SecurityGroups, KeyName, UserData та інші налаштування
 
@@ -20,7 +20,17 @@ Resources:
   ECSStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: instances.yml
+      TemplateURL: URL до шаблону ECS
+      Parameters:
+        # Визначте параметри за потреби
+        # Наприклад, параметри для кластера ECS, ролей, мережі тощо
+      Tags:
+        - Key: key1
+          Value: value1
+        - Key: key2
+          Value: value2
+        # Визначте теги за потреби
+        # Наприклад, мітки для стеку ECS
 
   ECSRegisterTaskDefinition:
     Type: AWS::ECS::TaskDefinition
