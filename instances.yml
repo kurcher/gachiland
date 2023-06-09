@@ -17,6 +17,11 @@ Resources:
       # Додайте необхідні властивості для EC2-інстансу 2
       # Наприклад, SecurityGroups, KeyName, UserData та інші налаштування
 
+  ECSStack:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: <gachiland/services.yml>
+
   ECSRegisterTaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
