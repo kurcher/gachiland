@@ -20,7 +20,7 @@ Resources:
   ECSStack:
     Type: AWS::CloudFormation::Stack
     Properties:
-      TemplateURL: <gachiland/services.yml>
+      TemplateURL: gachiland/services.yml
 
   ECSRegisterTaskDefinition:
     Type: AWS::ECS::TaskDefinition
