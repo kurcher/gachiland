@@ -21,9 +21,6 @@ Resources:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: services.yml
-      Parameters:
-        # Define parameters as needed for the ECS stack template
-        # For example, cluster name, roles, network configurations, etc.
       Tags:
         - Key: key1
           Value: value1
