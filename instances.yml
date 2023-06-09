@@ -1,32 +1,41 @@
 AWSTemplateFormatVersion: '2010-09-09'
 
+Parameters:
+  ECSStackParameter1:
+    Type: String
+    Default: DefaultValue1
+    # Додайте додаткові параметри для вкладеного стеку ECS
+
 Resources:
   EC2Instance1:
     Type: AWS::EC2::Instance
     Properties:
       ImageId: ami-07151644aeb34558a   
       InstanceType: t2.micro
-      # Add necessary properties for EC2 Instance 1
-      # For example, SecurityGroups, KeyName, UserData, and other configurations
+      # Додайте необхідні властивості для EC2-інстансу 1 
+      # Наприклад, SecurityGroups, KeyName, UserData та інші налаштування
 
   EC2Instance2:
     Type: AWS::EC2::Instance
     Properties: 
       ImageId: ami-07151644aeb34558a
       InstanceType: t2.micro
-      # Add necessary properties for EC2 Instance 2
-      # For example, SecurityGroups, KeyName, UserData, and other configurations
+      # Додайте необхідні властивості для EC2-інстансу 2
+      # Наприклад, SecurityGroups, KeyName, UserData та інші налаштування
 
   ECSStack:
     Type: AWS::CloudFormation::Stack
     Properties:
       TemplateURL: services.yml
+      Parameters:
+        ECSStackParameter1: !Ref ECSStackParameter1
+        # Передайте значення параметрів до вкладеного стеку ECS
       Tags:
         - Key: key1
           Value: value1
         - Key: key2
           Value: value2
-        # Define tags as needed for the ECS stack
+        # Визначте теги за необхідності для стеку ECS
 
   ECSRegisterTaskDefinition:
     Type: AWS::ECS::TaskDefinition
@@ -40,8 +49,8 @@ Resources:
           PortMappings:
             - ContainerPort: 80
               Protocol: tcp
-          # Add any additional parameters for the landing container
-          # For example, Environment, Volumes, Logging, and other configurations
+          # Додайте будь-які додаткові параметри для контейнера лендінгу
+          # Наприклад, Environment, Volumes, Logging та інші налаштування
 
   ECSRegisterEC2Instances:
     Type: AWS::ECS::Service
