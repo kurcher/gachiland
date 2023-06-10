@@ -1,26 +1,27 @@
 AWSTemplateFormatVersion: '2010-09-09'
+
 Resources:
   ECSCluster:
     Type: AWS::ECS::Cluster
     Properties:
       ClusterName: kurchuster
-      # Додаткові властивості для ECS-кластера
+      # Add additional properties for the ECS cluster
 
   ECSLandingTaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
-      # Встановіть властивості для Task Definition лендінгу
+      # Set properties for the landing Task Definition
       ContainerDefinitions:
         - Name: landing
           Image: nginx:latest
           PortMappings:
             - ContainerPort: 80
-          # Додайте необхідні параметри для контейнера лендінгу
+          # Add necessary parameters for the landing container
 
   ECSLandingService:
     Type: AWS::ECS::Service
     Properties:
-      Cluster: kurchuster
+      Cluster: !Ref "ECSCluster"
       TaskDefinition: !Ref ECSLandingTaskDefinition
       DesiredCount: 2
-      LaunchType: EC2
+      LaunchType: EC2 
