@@ -1,27 +1,78 @@
 AWSTemplateFormatVersion: '2010-09-09'
-
 Resources:
   ECSCluster:
     Type: AWS::ECS::Cluster
     Properties:
       ClusterName: kurchuster
-      # Add additional properties for the ECS cluster
 
-  ECSLandingTaskDefinition:
-    Type: AWS::ECS::TaskDefinition
+  EC2InstanceRole:
+    Type: AWS::IAM::Role
     Properties:
-      # Set properties for the landing Task Definition
-      ContainerDefinitions:
-        - Name: landing
-          Image: nginx:latest
-          PortMappings:
-            - ContainerPort: 80
-          # Add necessary parameters for the landing container
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          
+Effect: Allow
+          Principal:
+            Service: ec2.amazonaws.com
+          Action: sts:AssumeRole
+    ManagedPolicyArns:
+arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role
 
-  ECSLandingService:
-    Type: AWS::ECS::Service
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
     Properties:
-      Cluster: !Ref "ECSCluster"
-      TaskDefinition: !Ref ECSLandingTaskDefinition
-      DesiredCount: 2
-      LaunchType: EC2  
+      Roles:
+        
+!Ref EC2InstanceRole
+EC2InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for ECS EC2 instances
+      SecurityGroupIngress:
+        
+IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 0.0.0.0/0
+
+  EC2InstanceLaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateName: EC2InstanceLaunchTemplate
+      LaunchTemplateData:
+        ImageId: ami-04e4606740c9c9381
+        InstanceType: t2.micro
+        IamInstanceProfile:
+          Name: !Ref EC2InstanceProfile
+        SecurityGroupIds:
+          
+!Ref EC2InstanceSecurityGroup
+      UserData:Fn::Base64: !Sub |#!/bin/bash
+          echo ECS_CLUSTER=DeepStick >> /etc/ecs/ecs.config
+      TagSpecifications:
+ResourceType: instance
+        Tags:
+Key: Name
+          Value: ECSInstance
+
+  EC2AutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AutoScalingGroupName: EC2AutoScalingGroup
+      LaunchTemplate:
+        LaunchTemplateName: !Ref EC2InstanceLaunchTemplate
+        Version: !GetAtt EC2InstanceLaunchTemplate.LatestVersionNumber
+      MinSize: 1
+      MaxSize: 2
+      DesiredCapacity: 1
+      Tags:
+        
+Key: Name
+        Value: EC2Instance
+        PropagateAtLaunch: 'true'
+
+Outputs:
+  ECSClusterName:
+    Value: !Ref ECSCluster
+    Description: ECS Cluster Name
