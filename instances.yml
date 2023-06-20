@@ -24,26 +24,4 @@ Resources:
       # Наприклад, SecurityGroups, KeyName, UserData та інші налаштування
 
  
-
-  ECSRegisterTaskDefinition:
-    Type: AWS::ECS::TaskDefinition
-    Properties:
-      Family: !Ref AWS::ECSStack
-      ContainerDefinitions:
-        - Name: landing
-          Memory: 512
-          Essential: true
-          Image: nginx:latest
-          PortMappings:
-            - ContainerPort: 80
-              Protocol: tcp
-          # Додайте будь-які додаткові параметри для контейнера лендінгу
-          # Наприклад, Environment, Volumes, Logging та інші налаштування
-
-  ECSRegisterEC2Instances:
-    Type: AWS::ECS::Service
-    Properties:
-      Cluster: kurchuster
-      TaskDefinition: !Ref ECSRegisterTaskDefinition
-      DesiredCount: 2
-      LaunchType: EC2
+   
