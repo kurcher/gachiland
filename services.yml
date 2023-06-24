@@ -1,78 +1,55 @@
-AWSTemplateFormatVersion: '2010-09-09'
+
+   AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  StackName:
+    Type: String
+    Default: DeepLearnProject
+
 Resources:
-  ECSCluster:
-    Type: AWS::ECS::Cluster
+  TaskDefinition1:
+    Type: AWS::ECS::TaskDefinition
     Properties:
-      ClusterName: kurchuster
-
-  EC2InstanceRole:
-    Type: AWS::IAM::Role
-    Properties:
-      AssumeRolePolicyDocument:
-        Version: '2012-10-17'
-        Statement:
-          
-Effect: Allow 
-          Principal:
-            Service: ec2.amazonaws.com
-          Action: sts:AssumeRole
-    ManagedPolicyArns:
-arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role
-
-  EC2InstanceProfile:
-    Type: AWS::IAM::InstanceProfile
-    Properties:
-      Roles:
+      ContainerDefinitions:
         
-!Ref EC2InstanceRole
-EC2InstanceSecurityGroup:
-    Type: AWS::EC2::SecurityGroup
+Name: "web"
+        Image: "nginx"
+        PortMappings:
+ContainerPort: 80
+      Memory: 512
+      Cpu: 256
+  Family: "justfamily1"
+  NetworkMode: "bridge"
+  RequiresCompatibilities:
+"EC2"
+
+  TaskDefinition2:
+    Type: AWS::ECS::TaskDefinition
     Properties:
-      GroupDescription: Security group for ECS EC2 instances
-      SecurityGroupIngress:
+      ContainerDefinitions:
         
-IpProtocol: tcp
-        FromPort: 22
-        ToPort: 22
-        CidrIp: 0.0.0.0/0
+Name: "simple-task"
+        Image: "hello-world"
+        Memory: 512
+        Cpu: 256
+    Family: "justfamily2"
+    NetworkMode: "bridge"
+    RequiresCompatibilities:
+"EC2"
 
-  EC2InstanceLaunchTemplate:
-    Type: AWS::EC2::LaunchTemplate
-    Properties:
-      LaunchTemplateName: EC2InstanceLaunchTemplate
-      LaunchTemplateData:
-        ImageId: ami-04e4606740c9c9381
-        InstanceType: t2.micro
-        IamInstanceProfile:
-          Name: !Ref EC2InstanceProfile
-        SecurityGroupIds:
-          
-!Ref EC2InstanceSecurityGroup
-      UserData:Fn::Base64: !Sub |#!/bin/bash
-          echo ECS_CLUSTER=DeepStick >> /etc/ecs/ecs.config
-      TagSpecifications:
-ResourceType: instance
-        Tags:
-Key: Name
-          Value: ECSInstance
+  Service1:
+  Type: AWS::ECS::Service
+  Properties:
+    Cluster: !ImportValue ECSClusterName
+    DesiredCount: 1
+    TaskDefinition: !Ref TaskDefinition1
+    LaunchType: "EC2"
+    SchedulingStrategy: "REPLICA"
 
-  EC2AutoScalingGroup:
-    Type: AWS::AutoScaling::AutoScalingGroup
-    Properties:
-      AutoScalingGroupName: EC2AutoScalingGroup
-      LaunchTemplate:
-        LaunchTemplateName: !Ref EC2InstanceLaunchTemplate
-        Version: !GetAtt EC2InstanceLaunchTemplate.LatestVersionNumber
-      MinSize: 1
-      MaxSize: 2
-      DesiredCapacity: 1
-      Tags:
-        
-Key: Name
-        Value: EC2Instance
-        PropagateAtLaunch: 'true'
-
-Outputs:
-  ECSClusterName:
-    Value: !Ref ECSCluster
-    Description: ECS Cluster Name
+Service2:
+  Type: AWS::ECS::Service
+  Properties:
+    Cluster: !ImportValue ECSClusterName
+    DesiredCount: 1
+    TaskDefinition: !Ref TaskDefinition2
+    LaunchType: "EC2"
+    SchedulingStrategy: "REPLICA"
