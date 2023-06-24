@@ -1,3 +1,9 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  StackName:
+    Type: String
+    Default: kurchuster
+
 Resources:
   VPC:
     Type: AWS::EC2::VPC
@@ -32,8 +38,7 @@ Resources:
     Properties:
       Path: "/"
       Roles:
-        
-!Ref EC2InstanceRole
+        - !Ref EC2InstanceRole
 
   EC2InstanceRole:
     Type: AWS::IAM::Role
@@ -41,14 +46,14 @@ Resources:
       AssumeRolePolicyDocument:
         Version: "2012-10-17"
         Statement:
-          
-Effect: Allow
-          Principal:
-            Service: ec2.amazonaws.com
-          Action: sts:AssumeRole
-    ManagedPolicyArns:
-arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role
-EC2LaunchTemplate:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role
+
+  EC2LaunchTemplate:
     Type: AWS::EC2::LaunchTemplate
     Properties:
       LaunchTemplateName: EC2LaunchTemplate
@@ -56,12 +61,14 @@ EC2LaunchTemplate:
         ImageId: ami-0b2ac948e23c57071
         InstanceType: t2.micro
         SecurityGroupIds:
-          
-!Ref EC2InstanceSecurityGroup
+          - !Ref EC2InstanceSecurityGroup
       IamInstanceProfile:
         Arn: !GetAtt EC2InstanceProfile.Arn
-      UserData:Fn::Base64: !Sub |#!/bin/bash
-          echo ECS_CLUSTER=${ECSCluster} >> /etc/ecs/ecs.config
+      UserData: !Base64 
+        'Fn::Sub':
+          - |
+            #!/bin/bash
+            echo ECS_CLUSTER=${ECSCluster} >> /etc/ecs/ecs.config
 
   AutoScalingGroup:
     Type: AWS::AutoScaling::AutoScalingGroup
@@ -74,13 +81,12 @@ EC2LaunchTemplate:
       MaxSize: 2
       DesiredCapacity: 2
       VPCZoneIdentifier:
-        
-!Ref Subnet1
-!Ref Subnet2
-  Tags:
-Key: Name
-    Value: EC2Instance
-    PropagateAtLaunch: true
+        - !Ref Subnet1
+        - !Ref Subnet2
+      Tags:
+        - Key: Name
+          Value: EC2Instance
+          PropagateAtLaunch: true
 
 Outputs:
   ECSClusterName:
