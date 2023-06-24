@@ -87,6 +87,5 @@ Outputs:
     Value: !Ref ECSCluster
     Export:
       Name: ECSClusterName
-
  
    
