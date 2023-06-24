@@ -1,27 +1,92 @@
-AWSTemplateFormatVersion: '2010-09-09'
-
-Parameters:
-  ECSStackParameter1:
-    Type: String
-    Default: DefaultValue1
-    # Додайте додаткові параметри для вкладеного стеку ECS
-
 Resources:
-  EC2Instance1:
-    Type: AWS::EC2::Instance
+  VPC:
+    Type: AWS::EC2::VPC
     Properties:
-      ImageId: ami-04e4606740c9c9381 
-      InstanceType: t2.micro
-      # Додайте необхідні властивості для EC2-інстансу 1 
-      # Наприклад, SecurityGroups, KeyName, UserData та інші налаштування
+      CidrBlock: 10.0.0.0/16
 
-  EC2Instance2:
-    Type: AWS::EC2::Instance
-    Properties: 
-      ImageId: ami-04e4606740c9c9381
-      InstanceType: t2.micro
-      # Додайте необхідні властивості для EC2-інстансу 2
-      # Наприклад, SecurityGroups, KeyName, UserData та інші налаштування
+  Subnet1:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.0.0/24
+
+  Subnet2:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.1.0/24
+
+  ECSCluster:
+    Type: AWS::ECS::Cluster
+    Properties:
+      ClusterName: DeepStick
+
+  EC2InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Security group for EC2 instances
+      VpcId: !Ref VPC
+
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: "/"
+      Roles:
+        
+!Ref EC2InstanceRole
+
+  EC2InstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          
+Effect: Allow
+          Principal:
+            Service: ec2.amazonaws.com
+          Action: sts:AssumeRole
+    ManagedPolicyArns:
+arn:aws:iam::aws:policy/service-role/AmazonEC2ContainerServiceforEC2Role
+EC2LaunchTemplate:
+    Type: AWS::EC2::LaunchTemplate
+    Properties:
+      LaunchTemplateName: EC2LaunchTemplate
+      LaunchTemplateData:
+        ImageId: ami-0b2ac948e23c57071
+        InstanceType: t2.micro
+        SecurityGroupIds:
+          
+!Ref EC2InstanceSecurityGroup
+      IamInstanceProfile:
+        Arn: !GetAtt EC2InstanceProfile.Arn
+      UserData:Fn::Base64: !Sub |#!/bin/bash
+          echo ECS_CLUSTER=${ECSCluster} >> /etc/ecs/ecs.config
+
+  AutoScalingGroup:
+    Type: AWS::AutoScaling::AutoScalingGroup
+    Properties:
+      AutoScalingGroupName: EC2AutoScalingGroup
+      LaunchTemplate:
+        LaunchTemplateName: EC2LaunchTemplate
+        Version: !GetAtt EC2LaunchTemplate.LatestVersionNumber
+      MinSize: 2
+      MaxSize: 2
+      DesiredCapacity: 2
+      VPCZoneIdentifier:
+        
+!Ref Subnet1
+!Ref Subnet2
+  Tags:
+Key: Name
+    Value: EC2Instance
+    PropagateAtLaunch: true
+
+Outputs:
+  ECSClusterName:
+    Value: !Ref ECSCluster
+    Export:
+      Name: ECSClusterName
 
  
    
