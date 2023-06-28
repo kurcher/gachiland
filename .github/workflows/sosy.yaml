@@ -22,4 +22,4 @@ jobs:
     - name: Create EC2 Instances
       id: create-instances
       run: |
-        aws cloudformation deploy --stack-name node --template-file ec2-template.yaml --capabilities CAPABILITY_NAMED_IAM
+        aws cloudformation deploy --stack-name kurchuck --template-file ec2-template.yaml --capabilities CAPABILITY_NAMED_IAM
