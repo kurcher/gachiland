@@ -2,9 +2,8 @@ name: yurec
 
 on:
   push:
-    branches:
-      
-master
+    branches:      
+      - master
 
 jobs:
   deploy:
