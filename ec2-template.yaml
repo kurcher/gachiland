@@ -3,7 +3,7 @@ Resources:
   MyEC2Instance:
     Type: AWS::EC2::Instance
     Properties:
-      ImageId: ami-0a32b54520652b8b1  # ID образу Amazon Linux 2
+      ImageId: ami-0fa39983fed2f19c7  # ID образу Amazon Linux 2
       InstanceType: t2.micro  # Тип інстансу EC2, який вибираєте
       UserData:
         Fn::Base64: !Sub |
