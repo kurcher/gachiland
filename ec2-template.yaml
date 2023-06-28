@@ -1,25 +1,23 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Resources:
-  EC2Instance:
-    Type: 'AWS::EC2::Instance'
+  MyEC2Instance:
+    Type: AWS::EC2::Instance
     Properties:
-      ImageId: ami-0a32b54520652b8b1
-      InstanceType: t2.micro
-      SecurityGroups:
-        - Ref: InstanceSecurityGroup
+      ImageId: ami-0a32b54520652b8b1  # ID образу Amazon Linux 2
+      InstanceType: t2.micro  # Тип інстансу EC2, який вибираєте
       UserData:
-        Fn::Base64: |
+        Fn::Base64: !Sub |
           #!/bin/bash
-          yum update -y
-          yum install -y docker
-          service docker start
-          docker run -d -p 80:80 nginx:latest
-  InstanceSecurityGroup:
-    Type: 'AWS::EC2::SecurityGroup'
+          yum update -y  # Оновлення системи
+          yum install -y docker  # Встановлення Docker
+          service docker start  # Запуск сервісу Docker
+          docker run -d -p 80:80 nginx  # Запуск контейнера Nginx на порту 80
+  MyEIP:
+    Type: AWS::EC2::EIP
     Properties:
-      GroupDescription: Allow inbound connections on port 80
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 80
-          ToPort: 80
-          CidrIp: 0.0.0.0/0
+      InstanceId: !Ref MyEC2Instance  # Вказуємо, що Elastic IP пов'язаний з інстансом MyEC2Instance
+  MyEIPAssociation:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      AllocationId: !GetAtt MyEIP.AllocationId  # Отримуємо Allocation ID для Elastic IP
+      InstanceId: !Ref MyEC2Instance  # Прив'язка Elastic IP до інстансу MyEC2Instance
