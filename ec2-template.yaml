@@ -41,35 +41,11 @@ Resources:
           service docker start
           docker run -d -p 80:80 nginx
 
-  MySecurityGroup:
-    Type: AWS::EC2::SecurityGroup
-    Properties:
-      GroupDescription: My Security Group
-      VpcId: !Ref MyVPC
-      SecurityGroupIngress:
-        - IpProtocol: tcp
-          FromPort: 80
-          ToPort: 80
-          CidrIp: 0.0.0.0/0
-      Tags:
-        - Key: Name
-          Value: MySecurityGroup
-
-  MyNetworkInterface:
-    Type: AWS::EC2::NetworkInterface
-    Properties:
-      Description: "My Network Interface"
-      GroupSet:
-        - !Ref MySecurityGroup
-      SubnetId: !Ref MySubnet
-
   MyEIP:
     Type: AWS::EC2::EIP
-    Properties:
-      InstanceId: !Ref MyEC2Instance
 
   MyEIPAssociation:
     Type: AWS::EC2::EIPAssociation
     Properties:
       AllocationId: !GetAtt MyEIP.AllocationId
-      NetworkInterfaceId: !Ref MyNetworkInterface
+      InstanceId: !Ref MyEC2Instance
