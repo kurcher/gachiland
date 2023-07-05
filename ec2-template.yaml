@@ -31,11 +31,16 @@ Resources:
         - Key: Name
           Value: MySecurityGroup
 
+  MyNetworkInterface:
+    Type: AWS::EC2::NetworkInterface
+    Properties:
+      Description: "My Network Interface"
+      GroupSet:
+        - !Ref MySecurityGroup
+      SubnetId: !Ref MySubnet
+
   MyEIPAssociation:
     Type: AWS::EC2::EIPAssociation
     Properties:
       AllocationId: !GetAtt MyEIP.AllocationId
-      InstanceId: !Ref MyEC2Instance
-      NetworkInterfaceId: !Ref MyEC2Instance
-      GroupSet:
-        - !Ref MySecurityGroup
+      NetworkInterfaceId: !Ref MyNetworkInterface
