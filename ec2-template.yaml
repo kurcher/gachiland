@@ -11,7 +11,7 @@ Resources:
   MySubnet:
     Type: AWS::EC2::Subnet
     Properties:
-      VpcId: !Ref MyVPC 
+      VpcId: !Ref MyVPC
       CidrBlock: 10.0.0.0/24
       AvailabilityZone: eu-central-1a
       Tags:
@@ -55,6 +55,14 @@ Resources:
         - Key: Name
           Value: MySecurityGroup
 
+  MyNetworkInterface:
+    Type: AWS::EC2::NetworkInterface
+    Properties:
+      Description: "My Network Interface"
+      GroupSet:
+        - !Ref MySecurityGroup
+      SubnetId: !Ref MySubnet
+
   MyEIP:
     Type: AWS::EC2::EIP
     Properties:
@@ -64,4 +72,4 @@ Resources:
     Type: AWS::EC2::EIPAssociation
     Properties:
       AllocationId: !GetAtt MyEIP.AllocationId
-      NetworkInterfaceId: !Ref MyEC2Instance
+      NetworkInterfaceId: !Ref MyNetworkInterface
