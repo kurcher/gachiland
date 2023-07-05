@@ -8,6 +8,15 @@ Resources:
         - Key: Name
           Value: MyVPC
 
+  MyInternetGateway:
+    Type: AWS::EC2::InternetGateway
+
+  MyVPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref MyVPC
+      InternetGatewayId: !Ref MyInternetGateway
+
   MySubnet:
     Type: AWS::EC2::Subnet
     Properties:
@@ -32,11 +41,6 @@ Resources:
           service docker start  # Запуск сервісу Docker
           docker run -d -p 80:80 nginx  # Запуск контейнера Nginx на порту 80
 
-  MyEIP:
-    Type: AWS::EC2::EIP
-    Properties:
-      InstanceId: !Ref MyEC2Instance  # Вказуємо, що Elastic IP пов'язаний з інстансом MyEC2Instance
-
   MySecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -58,6 +62,12 @@ Resources:
       GroupSet:
         - !Ref MySecurityGroup
       SubnetId: !Ref MySubnet
+
+  MyEIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      InstanceId: !Ref MyEC2Instance  # Вказуємо, що Elastic IP пов'язаний з інстансом MyEC2Instance
+      DependsOn: MyVPCGatewayAttachment
 
   MyEIPAssociation:
     Type: AWS::EC2::EIPAssociation
