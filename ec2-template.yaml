@@ -43,9 +43,5 @@ Resources:
 
   MyEIP:
     Type: AWS::EC2::EIP
-
-  MyEIPAssociation:
-    Type: AWS::EC2::EIPAssociation
     Properties:
-      AllocationId: !GetAtt MyEIP.AllocationId
       InstanceId: !Ref MyEC2Instance
