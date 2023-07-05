@@ -20,4 +20,4 @@ Resources:
     Type: AWS::EC2::EIPAssociation
     Properties:
       AllocationId: !GetAtt MyEIP.AllocationId  # Отримуємо Allocation ID для Elastic IP
-      InstanceId: !Ref MyEC2Instance  # Прив'язка Elastic IP до інстансу MyEC2Instance
+      NetworkInterfaceId: !GetAtt MyEC2Instance.NetworkInterfaces[0].NetworkInterfaceId  # Прив'язка Elastic IP до мережевого інтерфейсу EC
