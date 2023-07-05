@@ -12,12 +12,30 @@ Resources:
           yum install -y docker  # Встановлення Docker
           service docker start  # Запуск сервісу Docker
           docker run -d -p 80:80 nginx  # Запуск контейнера Nginx на порту 80
+
   MyEIP:
     Type: AWS::EC2::EIP
     Properties:
       InstanceId: !Ref MyEC2Instance  # Вказуємо, що Elastic IP пов'язаний з інстансом MyEC2Instance
+
+  MySecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: My Security Group
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: MySecurityGroup
+
   MyEIPAssociation:
     Type: AWS::EC2::EIPAssociation
     Properties:
-      AllocationId: !GetAtt MyEIP.AllocationId  # Отримуємо Allocation ID для Elastic IP
-      NetworkInterfaceId: !GetAtt MyEC2Instance.NetworkInterfaces[0].NetworkInterfaceId  # Прив'язка Elastic IP до мережевого інтерфейсу EC
+      AllocationId: !GetAtt MyEIP.AllocationId
+      InstanceId: !Ref MyEC2Instance
+      NetworkInterfaceId: !Ref MyEC2Instance
+      GroupSet:
+        - !Ref MySecurityGroup
