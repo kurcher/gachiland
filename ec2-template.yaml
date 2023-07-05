@@ -1,11 +1,30 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Resources:
+  MyVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      Tags:
+        - Key: Name
+          Value: MyVPC
+
+  MySubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref MyVPC
+      CidrBlock: 10.0.0.0/24
+      AvailabilityZone: eu-central-1a
+      Tags:
+        - Key: Name
+          Value: MySubnet
+
   MyEC2Instance:
     Type: AWS::EC2::Instance
     Properties:
       ImageId: ami-0fa39983fed2f19c7  # ID образу Amazon Linux 2
       InstanceType: t2.micro  # Тип інстансу EC2, який вибираєте
-      UserData:   
+      SubnetId: !Ref MySubnet
+      UserData:  
         Fn::Base64: !Sub |  
           #!/bin/bash
           yum update -y  # Оновлення системи
@@ -22,6 +41,7 @@ Resources:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: My Security Group
+      VpcId: !Ref MyVPC
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 80
