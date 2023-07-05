@@ -8,15 +8,6 @@ Resources:
         - Key: Name
           Value: MyVPC
 
-  MyInternetGateway:
-    Type: AWS::EC2::InternetGateway
-
-  MyVPCGatewayAttachment:
-    Type: AWS::EC2::VPCGatewayAttachment
-    Properties: 
-      VpcId: !Ref MyVPC
-      InternetGatewayId: !Ref MyInternetGateway
-
   MySubnet:
     Type: AWS::EC2::Subnet
     Properties:
@@ -27,19 +18,28 @@ Resources:
         - Key: Name
           Value: MySubnet
 
+  MyInternetGateway:
+    Type: AWS::EC2::InternetGateway
+
+  MyVPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref MyVPC
+      InternetGatewayId: !Ref MyInternetGateway
+
   MyEC2Instance:
     Type: AWS::EC2::Instance
     Properties:
-      ImageId: ami-0fa39983fed2f19c7  # ID образу Amazon Linux 2
-      InstanceType: t2.micro  # Тип інстансу EC2, який вибираєте
+      ImageId: ami-0fa39983fed2f19c7
+      InstanceType: t2.micro
       SubnetId: !Ref MySubnet
-      UserData:  
-        Fn::Base64: !Sub |  
+      UserData:
+        Fn::Base64: !Sub |
           #!/bin/bash
-          yum update -y  # Оновлення системи
-          yum install -y docker  # Встановлення Docker
-          service docker start  # Запуск сервісу Docker
-          docker run -d -p 80:80 nginx  # Запуск контейнера Nginx на порту 80
+          yum update -y
+          yum install -y docker
+          service docker start
+          docker run -d -p 80:80 nginx
 
   MySecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -55,22 +55,13 @@ Resources:
         - Key: Name
           Value: MySecurityGroup
 
-  MyNetworkInterface:
-    Type: AWS::EC2::NetworkInterface
-    Properties:
-      Description: "My Network Interface"
-      GroupSet:
-        - !Ref MySecurityGroup
-      SubnetId: !Ref MySubnet
-
   MyEIP:
     Type: AWS::EC2::EIP
     Properties:
-      InstanceId: !Ref MyEC2Instance  # Вказуємо, що Elastic IP пов'язаний з інстансом MyEC2Instance
-      DependsOn: MyVPCGatewayAttachment
+      InstanceId: !Ref MyEC2Instance
 
   MyEIPAssociation:
     Type: AWS::EC2::EIPAssociation
     Properties:
       AllocationId: !GetAtt MyEIP.AllocationId
-      NetworkInterfaceId: !Ref MyNetworkInterface
+      NetworkInterfaceId: !Ref MyEC2Instance
