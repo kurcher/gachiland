@@ -45,3 +45,10 @@ Resources:
     Type: AWS::EC2::EIP
     Properties:
       InstanceId: !Ref MyEC2Instance
+
+  MyEIPAssociation:
+    Type: AWS::EC2::EIPAssociation
+    Properties:
+      AllocationId: !GetAtt MyEIP.AllocationId
+      InstanceId: !Ref MyEC2Instance
+
