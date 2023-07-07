@@ -66,20 +66,8 @@ Resources:
       Tags:
         - Key: Name
           Value: MySecurityGroup
-      Properties:
-        GroupDescription: Security group for EC2 instance
-        VpcId: !Ref MyVPC
-        SecurityGroupIngress:
-          - IpProtocol: tcp
-            FromPort: 80
-            ToPort: 80
-            CidrIp: 0.0.0.0/0
-        Tags:
-          - Key: Name
-            Value: MySecurityGroup
 
 Outputs:
   EC2InstancePublicIP:
     Value: !GetAtt MyEC2Instance.PublicIp
     Description: Public IP address of the EC2 instance
-
