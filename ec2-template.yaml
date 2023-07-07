@@ -7,7 +7,7 @@ Resources:
       Tags:
         - Key: Name
           Value: MyVPC
-
+  
   MySubnet:
     Type: AWS::EC2::Subnet
     Properties:
