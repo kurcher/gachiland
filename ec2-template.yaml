@@ -4,35 +4,43 @@ Resources:
     Type: AWS::EC2::VPC
     Properties:
       CidrBlock: 10.0.0.0/16
-      Tags:
-        - Key: Name
-          Value: MyVPC
-  
   MySubnet:
     Type: AWS::EC2::Subnet
     Properties:
       VpcId: !Ref MyVPC
       CidrBlock: 10.0.0.0/24
-      AvailabilityZone: eu-central-1a
-      Tags:
-        - Key: Name
-          Value: MySubnet
-
   MyInternetGateway:
     Type: AWS::EC2::InternetGateway
-
   MyVPCGatewayAttachment:
     Type: AWS::EC2::VPCGatewayAttachment
     Properties:
       VpcId: !Ref MyVPC
       InternetGatewayId: !Ref MyInternetGateway
-
+  MyRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref MyVPC
+  MyRoute:
+    Type: AWS::EC2::Route
+    DependsOn: MyInternetGateway
+    Properties:
+      RouteTableId: !Ref MyRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref MyInternetGateway
+  MySubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref MySubnet
+      RouteTableId: !Ref MyRouteTable
   MyEC2Instance:
     Type: AWS::EC2::Instance
     Properties:
-      ImageId: ami-0fa39983fed2f19c7
+      ImageId: ami-0749e2c902c836c08
       InstanceType: t2.micro
       SubnetId: !Ref MySubnet
+      KeyName: wireguard
+      SecurityGroupIds:
+        - !Ref MySecurityGroup
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
@@ -40,34 +48,27 @@ Resources:
           yum install -y docker
           service docker start
           docker run -d -p 80:80 nginx
-
-  MyEIP:
-    Type: AWS::EC2::EIP
-    Properties:
-      InstanceId: !Ref MyEC2Instance
-
-  MyEIPAssociation:
-    Type: AWS::EC2::EIPAssociation
-    DependsOn: MyEC2Instance
-    Properties:
-      AllocationId: !GetAtt MyEIP.AllocationId
-      InstanceId: !Ref MyEC2Instance
-
   MySecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
-      GroupDescription: Security group for EC2 instance
+      GroupDescription: Allow HTTP and SSH access
       VpcId: !Ref MyVPC
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 80
           ToPort: 80
           CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: '-1'
+          CidrIp: 0.0.0.0/0
       Tags:
         - Key: Name
           Value: MySecurityGroup
-
-Outputs:
-  EC2InstancePublicIP:
-    Value: !GetAtt MyEC2Instance.PublicIp
-    Description: Public IP address of the EC2 instance
+  MyEIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      InstanceId: !Ref MyEC2Instance
