@@ -9,7 +9,7 @@ Resources:
     Properties: 
       VpcId: !Ref MyVPC
       CidrBlock: 10.0.0.0/24
-  MyInternetGateway:
+  MyInternetGateway:  
     Type: AWS::EC2::InternetGateway
   MyVPCGatewayAttachment:
     Type: AWS::EC2::VPCGatewayAttachment
