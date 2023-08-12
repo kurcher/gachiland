@@ -6,7 +6,7 @@ Resources:
       CidrBlock: 10.0.0.0/16 
   MySubnet:
     Type: AWS::EC2::Subnet 
-    Properties: 
+    Properties:  
       VpcId: !Ref MyVPC  
       CidrBlock: 10.0.0.0/24 
   MyInternetGateway:  
