@@ -13,7 +13,7 @@ Resources:
     Type: AWS::EC2::InternetGateway
   MyVPCGatewayAttachment:
     Type: AWS::EC2::VPCGatewayAttachment 
-    Properties:  
+    Properties:   
       VpcId: !Ref MyVPC
       InternetGatewayId: !Ref MyInternetGateway   
   MyRouteTable:
