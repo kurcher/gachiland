@@ -7,7 +7,7 @@ Resources:
   MySubnet:
     Type: AWS::EC2::Subnet 
     Properties:  
-      VpcId: !Ref MyVPC  
+      VpcId: !Ref MyVPC   
       CidrBlock: 10.0.0.0/24 
   MyInternetGateway:   
     Type: AWS::EC2::InternetGateway
