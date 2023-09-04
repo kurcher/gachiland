@@ -47,7 +47,7 @@ Resources:
           yum update -y
           yum install -y docker
           service docker start
-          docker run -d -p 80:80 nginx
+          docker run -d -p 80:80 nginx 
   MySecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
