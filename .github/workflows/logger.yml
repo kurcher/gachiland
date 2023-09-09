@@ -1,4 +1,4 @@
-name: Create EC2 Instance
+name: Create EC2 Instance with ELK Stack
 
 on:
   push:
@@ -27,4 +27,32 @@ jobs:
             --instance-type t2.micro \
             --key-name kurchello \
             --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=MyInstance}]'
+      - name: Install Docker on EC2
+        run: |
+          # Встановлення Docker на EC2 інстанс
+          sudo apt-get update
+          sudo apt-get install -y docker.io
+          sudo systemctl start docker
+          sudo systemctl enable docker
+
+      - name: Run Elasticsearch and Kibana in Docker
+        run: |
+          # Запуск Elasticsearch та Kibana контейнерів у Docker на EC2 інстансі
+          docker run -d --name elasticsearch -p 9200:9200 -p 9300:9300 -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:7.10.2
+          docker run -d --name kibana -p 5601:5601 --link elasticsearch:elasticsearch docker.elastic.co/kibana/kibana:7.10.2
+
+      - name: Install Logstash on EC2
+        run: |
+          # Встановлення Logstash на EC2 інстанс
+          sudo docker pull docker.elastic.co/logstash/logstash:7.10.2
+
+      - name: Configure and Run Logstash
+        run: |
+          # Налаштування та запуск Logstash для збору та обробки логів
+          sudo docker run -d --name logstash --link elasticsearch:elasticsearch -v /path/to/your/logstash/config:/usr/share/logstash/config docker.elastic.co/logstash/logstash:7.10.2
+
+      - name: Access Kibana
+        run: |
+          # Вивести URL для доступу до Kibana
+          echo "Kibana is accessible at http://your-ec2-instance-public-ip:5601"
             
