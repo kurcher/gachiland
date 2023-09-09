@@ -23,7 +23,7 @@ jobs:
       - name: Create EC2 Instance
         run: |
           aws ec2 run-instances \
-            --image-id ami-04e601abe3e1a910f
+            --image-id ami-04e601abe3e1a910f \
             --instance-type t2.micro \
             --key-name kurchello \
             --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=MyInstance}]'
