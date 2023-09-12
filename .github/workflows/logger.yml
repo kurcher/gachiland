@@ -1,4 +1,4 @@
-name: Create EC2 Instance with Docker
+name: Deploy CloudFormation Stack
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
       - master
 
 jobs:
-  create-ec2-instance:
+  deploy-stack:
     runs-on: ubuntu-latest
 
     steps:
@@ -20,37 +20,14 @@ jobs:
           aws-secret-access-key: ${{ secrets.SECRET }}
           aws-region: eu-central-1
 
-      - name: Create EC2 Instance
+      - name: Deploy CloudFormation Stack
         run: |
-          aws ec2 run-instances \
-            --image-id ami-04e601abe3e1a910f \
-            --instance-type t2.micro \
-            --key-name kurchello \
-            --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=MyInstance}]'
+          aws cloudformation create-stack \
+            --stack-name MyEC2InstanceStack \
+            --template-body file://loggertemplate.yml
+            --parameters ParameterKey=InstanceType,ParameterValue=t2.micro \
+            --capabilities CAPABILITY_IAM
 
-      - name: Install Docker
+      - name: Wait for CloudFormation Stack to Complete
         run: |
-          # Оновити пакети
-          sudo apt-get update
-          
-          # Встановити необхідні пакети для підтримки HTTPS
-          sudo apt-get install -y apt-transport-https ca-certificates curl software-properties-common
-
-          # Додати офіційний репозиторій Docker
-          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
-          echo "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-
-          # Встановити Docker та Docker Compose
-          sudo apt-get update
-          sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-compose
-
-          # Додати поточного користувача до групи docker (щоб не вводити sudo)
-          sudo usermod -aG docker $USER
-
-          # Запустити Docker
-          sudo systemctl start docker
-          sudo systemctl enable docker
-
-          # Перевірити версію Docker
-          docker --version
-            
+          aws cloudformation wait stack-create-complete --stack-name MyEC2InstanceStack
