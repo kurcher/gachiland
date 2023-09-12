@@ -2,7 +2,7 @@ AWSTemplateFormatVersion: "2010-09-09"
 Description: CloudFormation Template for creating an EC2 instance with Docker
 Resources:
   MyEC2Instance:
-    Type: AWS::EC2::Instance
+    Type: AWS::EC2::Instance 
     Properties:
       ImageId: ami-04e601abe3e1a910f
       InstanceType: t2.micro
