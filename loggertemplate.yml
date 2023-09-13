@@ -3,7 +3,7 @@ Description: CloudFormation Template for creating an EC2 instance with Docker
 Resources:
   MyEC2Instance:
     Type: AWS::EC2::Instance
-    Properties:
+    Properties: 
       ImageId: ami-04e601abe3e1a910f
       InstanceType: t2.micro
       KeyName: kurchello
