@@ -17,3 +17,7 @@ Resources:
           sh get-docker.sh
           usermod -aG docker $USER
           systemctl start docker
+
+          
+           # Запустити контейнер з PhpMyAdmin імеджом
+          docker run -d --name phpmyadmin -p 8080:80 -e PMA_ARBITRARY=1 phpmyadmin/phpmyadmin
