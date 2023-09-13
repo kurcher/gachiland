@@ -25,7 +25,6 @@ jobs:
           aws cloudformation create-stack \
             --stack-name MyEC2InstanceStack \
             --template-body file://loggertemplate.yml \
-            --parameters ParameterKey=InstanceType,ParameterValue=t2.micro \
             --capabilities CAPABILITY_IAM
 
       - name: Wait for CloudFormation Stack to Complete
