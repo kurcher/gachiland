@@ -43,6 +43,31 @@ Resources:
 
           # Налаштування Logstash
           # Ви можете налаштувати конфігураційні файли Logstash відповідно до вашого сценарію використання
+           # Завантажити та встановити плагін logstash-input-udp
+          sudo /usr/share/logstash/bin/logstash-plugin install logstash-input-udp
+
+          # Створити конфігураційний файл Logstash
+          echo 'input {
+            udp {
+              port => 514
+              type => syslog
+            }
+          }
+
+          filter {
+            # Додайте фільтри для обробки логів за потреби
+          }
+
+          output {
+            elasticsearch {
+              hosts => ["localhost:9200"]
+              index => "web-app-logs-%{+YYYY.MM.dd}"
+            }
+          }' | sudo tee /etc/logstash/conf.d/web-app.conf
+
+          # Запустити Logstash
+          sudo systemctl start logstash
+          sudo systemctl enable logstash
 
           # Встановлення Kibana
           sudo sh -c 'echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" > /etc/apt/sources.list.d/elastic-7.x.list'
