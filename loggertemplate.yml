@@ -15,7 +15,9 @@ Resources:
     Properties: 
       ImageId: ami-04e601abe3e1a910f
       InstanceType: t2.micro
-      KeyName: kurchello 
+      KeyName: kurchello
+      SecurityGroupIds:
+        - !Ref kurchsec
       Tags:
         - Key: Name
           Value: MyInstance
