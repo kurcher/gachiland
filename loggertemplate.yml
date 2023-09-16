@@ -1,6 +1,15 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: CloudFormation Template for creating an EC2 instance with Docker
 Resources:
+  kurchsec:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: kurchsec
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
   MyEC2Instance:
     Type: AWS::EC2::Instance
     Properties: 
