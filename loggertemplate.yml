@@ -1,6 +1,38 @@
 AWSTemplateFormatVersion: "2010-09-09"
 Description: CloudFormation Template for creating an EC2 instance with Docker
 Resources:
+   KVPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+  KSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref KVPC
+      CidrBlock: 10.0.0.0/24
+  KInternetGateway:
+    Type: AWS::EC2::InternetGateway
+  KVPCGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref KVPC
+      InternetGatewayId: !Ref KInternetGateway
+  KRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref KVPC
+  KRoute:
+    Type: AWS::EC2::Route
+    DependsOn: KInternetGateway
+    Properties:
+      RouteTableId: !Ref KRouteTable
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref KInternetGateway
+  KSubnetRouteTableAssociation:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      SubnetId: !Ref KSubnet
+      RouteTableId: !Ref KRouteTable
   kurchsec:
     Type: AWS::EC2::SecurityGroup
     Properties:
@@ -10,6 +42,33 @@ Resources:
           FromPort: 22
           ToPort: 22
           CidrIp: 0.0.0.0/0
+      VpcId: !Ref KVPC
+
+   KSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow HTTP and SSH access
+      VpcId: !Ref KVPC
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: '-1'
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: KSecurityGroup
+
+  KEIP:
+    Type: AWS::EC2::EIP
+    Properties:
+      InstanceId: !Ref MyEC2Instance
   MyEC2Instance:
     Type: AWS::EC2::Instance
     Properties: 
@@ -18,82 +77,59 @@ Resources:
       KeyName: kurchello
       SecurityGroupIds:
         - !Ref kurchsec
+      SubnetId: !Ref KSubnet
       Tags:
         - Key: Name
           Value: MyInstance
+  
       UserData:
         Fn::Base64: |
-          #!/bin/bash -xe
-          curl -fsSL https://get.docker.com -o get-docker.sh
-          sh get-docker.sh
-          usermod -aG docker $USER
-          systemctl start docker
-
-          
-           # Запустити контейнер з PhpMyAdmin імеджом
-          docker run -d --name phpmyadmin -p 8080:80 -e PMA_ARBITRARY=1 phpmyadmin/phpmyadmin
-
-
-              # Встановлення Java
-          sudo apt-get install -y openjdk-11-jre
-
-          # Встановлення Elasticsearch
-          wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
-          sudo sh -c 'echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" > /etc/apt/sources.list.d/elastic-7.x.list'
-          sudo apt-get update
-          sudo apt-get install -y elasticsearch
-
-          # Налаштування Elasticsearch
+          #!/bin/bash
+          sudo yum update -y
+          sudo amazon-linux-extras install -y java-openjdk11
+          sudo rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
+          sudo tee /etc/yum.repos.d/elasticsearch.repo <<EOF
+          [elasticsearch-7.x]
+          name=Elasticsearch repository for 7.x packages
+          baseurl=https://artifacts.elastic.co/packages/7.x/yum
+          gpgcheck=1
+          gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
+          enabled=1
+          autorefresh=1
+          type=rpm-md
+          EOF
+          sudo yum install -y elasticsearch kibana logstash
           sudo systemctl start elasticsearch
-          sudo systemctl enable elasticsearch
+          sudo systemctl start kibana
+          sudo systemctl start logstash
+          
+          sudo amazon-linux-extras install -y lamp-mariadb10.2-php7.2 phpmyadmin
+          sudo bash -c "echo '\$cfg[\"Error_Handler\"][\"display\"] = false;' >> /etc/phpMyAdmin/config.inc.php"
+          sudo bash -c "echo '\$cfg[\"Error_Handler\"][\"parameters\"][\"display\"] = true;' >> /etc/phpMyAdmin/config.inc.php"
+          sudo bash -c "echo '\$cfg[\"Error_Handler\"][\"syslog\"] = true;' >> /etc/phpMyAdmin/config.inc.php"
+          sudo systemctl restart httpd
 
-          # Встановлення Logstash
-          sudo sh -c 'echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" > /etc/apt/sources.list.d/elastic-7.x.list'
-          sudo apt-get update
-          sudo apt-get install -y logstash
-
-          # Налаштування Logstash
-          # Ви можете налаштувати конфігураційні файли Logstash відповідно до вашого сценарію використання
-           # Завантажити та встановити плагін logstash-input-udp
-          sudo /usr/share/logstash/bin/logstash-plugin install logstash-input-udp
-
-          # Створити конфігураційний файл Logstash
-          echo 'input {
-            udp {
-              port => 514
-              type => syslog
+          # ???????????? Logstash ??? ????? ????? ? PHPMyAdmin
+          sudo tee /etc/logstash/conf.d/phpmyadmin.conf <<EOF
+          input {
+            file {
+              path => "/var/log/phpmyadmin.log"
+              start_position => "beginning"
             }
           }
-
           filter {
-            # Додайте фільтри для обробки логів за потреби
+            grok {
+              match => { "message" => "%{COMBINEDAPACHELOG}" }
+            }
           }
-
           output {
             elasticsearch {
               hosts => ["localhost:9200"]
-              index => "web-app-logs-%{+YYYY.MM.dd}"
-            }
-          }' | sudo tee /etc/logstash/conf.d/web-app.conf
-
-          # Запустити Logstash
-          sudo systemctl start logstash
-          sudo systemctl enable logstash
-
-          # Встановлення Kibana
-          sudo sh -c 'echo "deb https://artifacts.elastic.co/packages/7.x/apt stable main" > /etc/apt/sources.list.d/elastic-7.x.list'
-          sudo apt-get update
-          sudo apt-get install -y kibana
-
-          # Налаштування Kibana
-          sudo systemctl start kibana
-          sudo systemctl enable kibana
-
-          # Додайте правила брандмауера, якщо необхідно, щоб дозволити доступ до портів Elasticsearch та Kibana
-
-          # Завантаження та встановлення журналів (за потреби)
-
-          # Рестарт служб для застосування налаштувань
-          sudo systemctl restart elasticsearch
+              index => "phpmyadmin-%{+YYYY.MM.dd}"
+             }
+          }
+          EOF
           sudo systemctl restart logstash
-          sudo systemctl restart kibana
+          LOG_FILE=/var/log/phpmyadmin.log
+          echo "This is a log message." | sudo tee $LOG_FILE
+
