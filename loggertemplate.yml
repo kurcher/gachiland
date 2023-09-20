@@ -75,6 +75,7 @@ Resources:
           sudo systemctl start elasticsearch
           sudo systemctl start kibana
           sudo systemctl start logstash
+          echo "ELK Stack has been started."
           
           sudo amazon-linux-extras install -y lamp-mariadb10.2-php7.2 phpmyadmin
           sudo bash -c "echo '\$cfg[\"Error_Handler\"][\"display\"] = false;' >> /etc/phpMyAdmin/config.inc.php"
