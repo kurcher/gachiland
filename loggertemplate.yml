@@ -95,10 +95,9 @@ Resources:
          sudo bash -c "echo '\$cfg[\"Error_Handler\"][\"display\"] = false;' >> /etc/phpMyAdmin/config.inc.php"
          sudo bash -c "echo '\$cfg[\"Error_Handler\"][\"parameters\"][\"display\"] = true;' >> /etc/phpMyAdmin/config.inc.php"
          sudo bash -c "echo '\$cfg[\"Error_Handler\"][\"syslog\"] = true;' >> /etc/phpMyAdmin/config.inc.php"
-  
-        # Restart Apache web server
+         
          sudo systemctl restart httpd
-
+ 
           # Configure Logstash to parse PHPMyAdmin logs
          sudo tee /etc/logstash/conf.d/phpmyadmin.conf <<EOF
          input {
