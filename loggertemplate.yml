@@ -55,56 +55,77 @@ Resources:
       Tags:
         - Key: Name
           Value: MyInstance
-      UserData:
-        Fn::Base64: |
-          #!/bin/bash
-          sudo yum update -y
-          sudo amazon-linux-extras install -y java-openjdk11
-          sudo rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
-          sudo tee /etc/yum.repos.d/elasticsearch.repo <<EOF
-          [elasticsearch-7.x]
-          name=Elasticsearch repository for 7.x packages
-          baseurl=https://artifacts.elastic.co/packages/7.x/yum
-          gpgcheck=1
-          gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
-          enabled=1
-          autorefresh=1
-          type=rpm-md
-          EOF
-          sudo yum install -y elasticsearch kibana logstash
-          sudo systemctl start elasticsearch
-          sudo systemctl start kibana
-          sudo systemctl start logstash
-          
-          sudo amazon-linux-extras install -y lamp-mariadb10.2-php7.2 phpmyadmin
-          sudo bash -c "echo '\$cfg[\"Error_Handler\"][\"display\"] = false;' >> /etc/phpMyAdmin/config.inc.php"
-          sudo bash -c "echo '\$cfg[\"Error_Handler\"][\"parameters\"][\"display\"] = true;' >> /etc/phpMyAdmin/config.inc.php"
-          sudo bash -c "echo '\$cfg[\"Error_Handler\"][\"syslog\"] = true;' >> /etc/phpMyAdmin/config.inc.php"
-          sudo systemctl restart httpd
+  UserData:
+   Fn::Base64: |
+    #!/bin/bash
+    # Update the system
+    sudo yum update -y
 
-          # ???????????? Logstash ??? ????? ????? ? PHPMyAdmin
-          sudo tee /etc/logstash/conf.d/phpmyadmin.conf <<EOF
-          input {
-            file {
-              path => "/var/log/phpmyadmin.log"
-              start_position => "beginning"
-            }
-          }
-          filter {
-            grok {
-              match => { "message" => "%{COMBINEDAPACHELOG}" }
-            }
-          }
-          output {
-            elasticsearch {
-              hosts => ["localhost:9200"]
-              index => "phpmyadmin-%{+YYYY.MM.dd}"
-             }
-          }
-          EOF
-          sudo systemctl restart logstash
-          LOG_FILE=/var/log/phpmyadmin.log
-          echo "This is a log message." | sudo tee $LOG_FILE
+    # Install Java (required for Elasticsearch and Logstash)
+    sudo amazon-linux-extras install -y java-openjdk11
+
+    # Import the Elasticsearch GPG key and set up the repository
+    sudo rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    sudo tee /etc/yum.repos.d/elasticsearch.repo <<EOF
+    [elasticsearch-7.x]
+    name=Elasticsearch repository for 7.x packages
+    baseurl=https://artifacts.elastic.co/packages/7.x/yum
+    gpgcheck=1
+    gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
+    enabled=1
+    autorefresh=1
+    type=rpm-md
+    EOF
+
+    # Install Elasticsearch, Kibana, and Logstash
+    sudo yum install -y elasticsearch kibana logstash
+
+    # Start Elasticsearch, Kibana, and Logstash
+    sudo systemctl enable elasticsearch
+    sudo systemctl start elasticsearch
+    sudo systemctl enable kibana
+    sudo systemctl start kibana
+    sudo systemctl enable logstash
+    sudo systemctl start logstash
+
+    # Install LAMP stack, MariaDB, PHP, and PHPMyAdmin
+    sudo amazon-linux-extras install -y lamp-mariadb10.2-php7.2 phpmyadmin
+
+    # Configure PHPMyAdmin error handling
+    sudo bash -c "echo '\$cfg[\"Error_Handler\"][\"display\"] = false;' >> /etc/phpMyAdmin/config.inc.php"
+    sudo bash -c "echo '\$cfg[\"Error_Handler\"][\"parameters\"][\"display\"] = true;' >> /etc/phpMyAdmin/config.inc.php"
+    sudo bash -c "echo '\$cfg[\"Error_Handler\"][\"syslog\"] = true;' >> /etc/phpMyAdmin/config.inc.php"
+
+    # Restart Apache web server
+    sudo systemctl restart httpd
+
+    # Configure Logstash to parse PHPMyAdmin logs
+    sudo tee /etc/logstash/conf.d/phpmyadmin.conf <<EOF
+    input {
+      file {
+        path => "/var/log/phpmyadmin.log"
+        start_position => "beginning"
+      }
+    }
+    filter {
+      grok {
+        match => { "message" => "%{COMBINEDAPACHELOG}" }
+      }
+    }
+    output {
+      elasticsearch {
+        hosts => ["localhost:9200"]
+        index => "phpmyadmin-%{+YYYY.MM.dd}"
+      }
+    }
+    EOF
+
+    # Restart Logstash
+    sudo systemctl restart logstash
+
+    # Create a sample log message for testing
+    LOG_FILE=/var/log/phpmyadmin.log
+    echo "This is a log message." | sudo tee $LOG_FILE
   KSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
