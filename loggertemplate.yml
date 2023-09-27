@@ -93,7 +93,7 @@ Resources:
  
             # Configure PHPMyAdmin error handling
          sudo bash -c "echo '\$cfg[\"Error_Handler\"][\"display\"] = false;' >> /etc/phpMyAdmin/config.inc.php"
-         sudo bash -c "echo '\$cfg[\"Error_Handler\"][\"parameters\"][\"display\"] = true;' >> /etc/phpMyAdmin/config.inc.php"
+         sudo bash -c "echo '\$cfg[\"Error_Handler\"][\"parameters\"][\"display\"] = true;' >> /etc/phpMyAdmin/config.inc.php" 
          sudo bash -c "echo '\$cfg[\"Error_Handler\"][\"syslog\"] = true;' >> /etc/phpMyAdmin/config.inc.php"
          
          sudo systemctl restart httpd
