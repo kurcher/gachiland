@@ -1,0 +1,23 @@
+name: Deploy to Netlify
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: npm install # або використовуйте відповідну команду для вашого проекту
+
+      - name: Build and deploy to Netlify
+        run: |
+          npm run build # або відповідну команду для збирання вашого проекту
+          npx netlify-cli deploy --prod --dir=./build # або відповідну команду для деплою на Netlify
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
