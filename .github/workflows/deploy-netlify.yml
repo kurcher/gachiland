@@ -1,9 +1,9 @@
-name: Deploy to Netlify
+name: Deploy to Netlify on Change to index.html
 
 on:
   push:
-    branches:
-      - master
+    paths:
+      - 'index.html'  
 
 jobs:
   deploy:
@@ -16,9 +16,8 @@ jobs:
     - name: Deploy to Netlify
       uses: nwtgck/actions-netlify@v2.1.0
       with:
-        publish-dir: ./index.html  
+        publish-dir: ./ 
         command: deploy
       env:
         NETLIFY_AUTH_TOKEN: ${{ secrets.ForNetlify }}  
-
 
