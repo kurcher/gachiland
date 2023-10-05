@@ -1,23 +1,33 @@
 name: Deploy to Netlify
+
 on:
   push:
     branches:
-      - main
+      - main  # Змініть на відповідну назву вашої основної гілки
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+    - name: Checkout code
+      uses: actions/checkout@v2
 
-      - name: Install dependencies
-        run: npm install # або використовуйте відповідну команду для вашого проекту
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: 14  # Змініть на відповідну версію Node.js
 
-      - name: Build and deploy to Netlify
-        run: |
-          npm run build # або відповідну команду для збирання вашого проекту
-          npx netlify-cli deploy --prod --dir=./build # або відповідну команду для деплою на Netlify
-        env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+    - name: Install dependencies
+      run: npm install  # Змініть цю команду відповідно до вашого веб-застосунку
+
+    - name: Build and test
+      run: npm run build  # Змініть цю команду, якщо необхідно
+
+    - name: Deploy to Netlify
+      run: npx netlify-cli deploy --prod  # Використовуйте netlify-cli для деплою на Netlify
+
+    env:
+      NETLIFY_AUTH_TOKEN: ${{ secrets.ForNetlify }}  # Додайте токен доступу Netlify як секрет GitHub
+
+
