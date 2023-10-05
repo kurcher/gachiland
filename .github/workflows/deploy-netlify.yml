@@ -2,8 +2,8 @@ name: Deploy to Netlify on Change to index.html
 
 on:
   push:
-    paths:
-      - 'index.html'  
+    branches:
+      - master
 
 jobs:
   deploy:
