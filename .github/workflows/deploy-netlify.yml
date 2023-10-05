@@ -3,7 +3,7 @@ name: Deploy to Netlify
 on:
   push:
     branches:
-      - main  # Змініть на відповідну назву вашої основної гілки
+      - master
 
 jobs:
   deploy:
