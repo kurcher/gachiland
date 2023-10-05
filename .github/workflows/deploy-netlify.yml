@@ -13,21 +13,12 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v2
-      with:
-        node-version: 14  # Змініть на відповідну версію Node.js
-
-    - name: Install dependencies
-      run: npm install  # Змініть цю команду відповідно до вашого веб-застосунку
-
-    - name: Build and test
-      run: npm run build  # Змініть цю команду, якщо необхідно
-
     - name: Deploy to Netlify
-      run: npx netlify-cli deploy --prod  # Використовуйте netlify-cli для деплою на Netlify
-
-    env:
-      NETLIFY_AUTH_TOKEN: ${{ secrets.ForNetlify }}  # Додайте токен доступу Netlify як секрет GitHub
+      uses: nwtgck/actions-netlify@v2.1.0
+      with:
+        publish-dir: ./index.html  
+        command: deploy
+      env:
+        NETLIFY_AUTH_TOKEN: ${{ secrets.ForNetlify }}  
 
 
